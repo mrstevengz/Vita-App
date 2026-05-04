@@ -45,9 +45,9 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            Color(0xFFFFFFFF), // Blanco puro
-                            Color(0xFFF0F7F7), // Blanco con un toque mínimo de turquesa
-                            Color(0xFFE0F2F1)  // Menta muy claro
+                            Color(0xFFE0F7FA), // Cyan muy claro
+                            Color(0xFFB2EBF2), // Cyan pastel
+                            Color(0xFF80DEEA)  // Turquesa suave
                         )
 
                     )
