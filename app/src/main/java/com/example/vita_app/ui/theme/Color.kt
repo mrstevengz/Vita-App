@@ -20,3 +20,8 @@ val White = Color(0xFFFFFFFF)
 
 val BackgroundLight = Color(0xFFF7F8F6)
 val BackgroundAccent = Color(0xFFEFF3EC)
+
+//Colores en loginscreen atras del logo
+val LightCyan = Color(0xFFE0F7FA)
+val PastelCyan = Color(0xFFB2EBF2)
+val SoftTurqoise = Color(0xFF80DEEA)
