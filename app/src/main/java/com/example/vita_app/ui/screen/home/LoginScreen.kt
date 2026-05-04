@@ -45,9 +45,9 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            Color(0xFF0A2E2F),
-                            Color(0xFF1FA3A3),
-                            Color(0xFF4ED2C4)
+                            Color(0xFFFFFFFF), // Blanco puro
+                            Color(0xFFF0F7F7), // Blanco con un toque mínimo de turquesa
+                            Color(0xFFE0F2F1)  // Menta muy claro
                         )
 
                     )
@@ -55,7 +55,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
         ) {
             Box(
                 modifier = Modifier.matchParentSize()
-                    .background(Color.Black.copy(alpha = 0.15f))
+                    .background(Color.Black.copy(alpha = 0.05f))
             )
         }
 
