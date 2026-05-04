@@ -25,8 +25,11 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import com.example.vita_app.R
 import com.example.vita_app.ui.theme.BackgroundLight
 import com.example.vita_app.ui.theme.CarbonBlack
+import com.example.vita_app.ui.theme.LightCyan
 import com.example.vita_app.ui.theme.MutedOlive
 import com.example.vita_app.ui.theme.PineBlue
+import com.example.vita_app.ui.theme.SoftTurqoise
+import com.example.vita_app.ui.theme.PastelCyan
 import com.example.vita_app.ui.theme.White
 
 @Composable
@@ -45,9 +48,9 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            Color(0xFF0A2E2F),
-                            Color(0xFF1FA3A3),
-                            Color(0xFF4ED2C4)
+                            LightCyan,
+                            PastelCyan,
+                            SoftTurqoise
                         )
 
                     )
@@ -55,7 +58,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
         ) {
             Box(
                 modifier = Modifier.matchParentSize()
-                    .background(Color.Black.copy(alpha = 0.15f))
+                    .background(Color.Black.copy(alpha = 0.05f))
             )
         }
 
