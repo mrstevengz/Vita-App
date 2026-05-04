@@ -49,6 +49,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                             Color(0xFF1FA3A3),
                             Color(0xFF4ED2C4)
                         )
+
                     )
                 )
         ) {
@@ -122,14 +123,20 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                         else
                             PasswordVisualTransformation(),
                         trailingIcon = {
-                            Text(
-                                text = if (showPassword) "Hide" else "Show",
-                                modifier = Modifier.clickable {
-                                    showPassword = !showPassword
-                                },
-                                color = PineBlue,
-                                fontSize = 12.sp
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .clickable { showPassword = !showPassword }
+                                    .padding(end = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = if (showPassword) "Ocultar" else "Mostrar",
+                                    tint = PineBlue,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(2.dp))
+                            }
                         }
                     )
 
