@@ -33,7 +33,13 @@ fun AppNavigation() {
             })
         }
 
-
+// 2. Welcome Screen
+        composable<WelcomeRoute> {
+            WelcomeScreen(
+                onLoginClick = { navController.navigate(LoginRoute) },
+                onRegisterClick = {}
+            )
+        }
 
         // 3. Home Screen
         composable<HomeRoute> { backStackEntry ->
