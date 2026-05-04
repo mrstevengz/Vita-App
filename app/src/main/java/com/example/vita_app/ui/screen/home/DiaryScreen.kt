@@ -115,6 +115,7 @@ fun DiaryScreen(name: String, navController: NavHostController) {
                     MealSection(title = "Lunch")
                     MealSection(title = "Dinner")
                     MealSection(title = "Snacks")
+                    MealSection(title = "Water")
                 }
             }
         }
