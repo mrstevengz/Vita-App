@@ -28,7 +28,7 @@ Como el proyecto está en etapa de desarrollo, sigue estos pasos para probar el 
 1. **Clonar el repositorio:**
    Abre tu terminal y ejecuta el siguiente comando:
    ```bash
-   git clone [https://github.com/tu-usuario/VitaApp.git](https://github.com/tu-usuario/VitaApp.git)
+   git clone https://github.com/mrstevengz/Vita-App.git
    ```
 
 2. **Abrir el proyecto:**
