@@ -35,14 +35,16 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    // Contenedor principal
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // HEADER
+        // HEADER fondio superior
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(320.dp)
                 .background(
+                    // Gradiente de colores
                     brush = Brush.linearGradient(
                         colors = listOf(
                             Color(0xFF0A2E2F),
@@ -54,6 +56,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                 )
         ) {
             Box(
+                // Capa oscura encima (para efecto visual)
                 modifier = Modifier.matchParentSize()
                     .background(Color.Black.copy(alpha = 0.15f))
             )
@@ -82,7 +85,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                     .padding(horizontal = 24.dp),
                 shape = RoundedCornerShape(28.dp),
                 elevation = CardDefaults.cardElevation(8.dp),
-                colors = CardDefaults.cardColors(containerColor = White)
+                colors = CardDefaults.cardColors(containerColor = White) // Color de fondo de la tarjeta
             ) {
 
                 Column(
@@ -100,7 +103,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
 
                     OutlinedTextField(
                         value = username,
-                        onValueChange = { username = it },
+                        onValueChange = { username = it },    // Guarda lo que el usuario escribe
                         placeholder = { Text("Username") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
@@ -109,6 +112,8 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+
+                    // Estado para mostrar u ocultar contraseña
                     var showPassword by remember { mutableStateOf(false) }
 
                     OutlinedTextField(
@@ -118,10 +123,13 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         singleLine = true,
+                        // Si showPassword es true → muestra texto
+                        // si es false → oculta con puntos
                         visualTransformation = if (showPassword)
                             VisualTransformation.None
                         else
                             PasswordVisualTransformation(),
+                        // Icono para mostrar/ocultar contraseña
                         trailingIcon = {
                             Row(
                                 modifier = Modifier
@@ -147,7 +155,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                     ) {
 
                         Checkbox(
-                            checked = false,
+                            checked = false, // no guarda estado aún
                             onCheckedChange = {},
                             colors = CheckboxDefaults.colors(
                                 checkedColor = PineBlue
@@ -169,8 +177,9 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
 
                     Button(
                         onClick = {
+                            // Solo permite continuar si hay username
                             if (username.isNotEmpty()) {
-                                onLoginSuccess(username)
+                                onLoginSuccess(username) // Llama a la navegación (pantalla Home)
                             }
                         },
                         modifier = Modifier
@@ -185,7 +194,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                     }
                 }
             }
-
+            // Empuja tdo a arriba
             Spacer(modifier = Modifier.weight(1f))
         }
     }

@@ -30,13 +30,13 @@ import com.example.vita_app.ui.theme.White
 
 @Composable
 fun WelcomeScreen(
-    onLoginClick: () -> Unit,
+    onLoginClick: () -> Unit, // Acción cuando presiona "Iniciar sesión" o "Registrar"
     onRegisterClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
+            .background(// Fondo con gradiente vertical (de arriba hacia abajo)
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         Color(0xFF0A2E2F),
@@ -49,17 +49,17 @@ fun WelcomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(horizontal = 24.dp),// margen lateral
+            horizontalAlignment = Alignment.CenterHorizontally,   // centra horizontalmente
             verticalArrangement = Arrangement.Center
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                shape = RoundedCornerShape(24.dp),// Bordes redondeados
+                colors = CardDefaults.cardColors(containerColor = White), // Color de fondo de la tarjeta
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)// Sombra (elevación)
             ) {
-                Column(
+                Column(// Contenido interno de la tarjeta
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -74,7 +74,7 @@ fun WelcomeScreen(
 
                     Text(
                         text = "Elige una opción para continuar",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium // Usa estilo del tema
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -92,7 +92,7 @@ fun WelcomeScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Button(
+                    Button(// Botón deshabilitado (no se puede presionar)
                         onClick = onRegisterClick,
                         enabled = false,
                         modifier = Modifier
