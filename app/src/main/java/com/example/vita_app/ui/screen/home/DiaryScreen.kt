@@ -32,15 +32,17 @@ import com.example.vita_app.ui.theme.CarbonBlack
 @Composable
 fun DiaryScreen(name: String, navController: NavHostController) {
     Scaffold(
+        // Barra inferior de navegación
         bottomBar = { BottomBar(navController, name) }
     ) {
         innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            AppBackground {
+
+            AppBackground { // Fondo personalizado de la app
                 Column(
                     modifier = Modifier.fillMaxSize().padding(10.dp)
                 ) {
-
+                    // Barra superior con el nombre del usuario
                     HomeTopBar(name)
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -49,7 +51,9 @@ fun DiaryScreen(name: String, navController: NavHostController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
+                        // Bordes redondeados
                         shape = RoundedCornerShape(20.dp),
+                        // Elevación (sombra)
                         elevation = CardDefaults.cardElevation(6.dp)
                     ) {
 
