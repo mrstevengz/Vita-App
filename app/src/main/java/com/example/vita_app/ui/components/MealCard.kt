@@ -1,5 +1,6 @@
 package com.example.vita_app.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,7 +22,10 @@ import androidx.compose.ui.unit.sp
 import com.example.vita_app.ui.theme.CarbonBlack
 
 @Composable
-fun MealSection(title: String) {
+fun MealSection(
+    title: String,
+    onAddFoodClick: (() -> Unit)? = null // null = no clickeable (caso Water)
+) {
 
     Column(
         modifier = Modifier
@@ -41,7 +45,12 @@ fun MealSection(title: String) {
         Card(
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(4.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(
+                    if (onAddFoodClick != null) Modifier.clickable { onAddFoodClick() }
+                    else Modifier
+                )
         ) {
 
             Row(

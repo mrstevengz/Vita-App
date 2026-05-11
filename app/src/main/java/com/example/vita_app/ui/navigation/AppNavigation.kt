@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.vita_app.ui.screen.home.AddFoodScreen
 import com.example.vita_app.ui.screen.home.DiaryScreen
 import com.example.vita_app.ui.screen.home.HomeScreen
 import com.example.vita_app.ui.screen.home.LoginScreen
@@ -19,6 +20,8 @@ import kotlinx.serialization.Serializable
 @Serializable object LoginRoute
 @Serializable data class HomeRoute(val name: String)
 @Serializable data class DiaryRoute(val name: String)
+// mealType identifica desde qué sección se abrió (Breakfast, Lunch, Dinner, Snacks)
+@Serializable data class AddFoodRoute(val mealType: String)
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -61,6 +64,16 @@ fun AppNavigation() {
         composable<DiaryRoute> { backStackEntry ->
             val args = backStackEntry.toRoute<DiaryRoute>()
             DiaryScreen(name = args.name, navController = navController) // mostramos la pantalla diary
+        }
+
+        // 5. Add Food Screen
+        // Recibe el tipo de comida (Breakfast, Lunch, Dinner, Snacks) desde donde se abrió
+        composable<AddFoodRoute> { backStackEntry ->
+            val args = backStackEntry.toRoute<AddFoodRoute>()
+            AddFoodScreen(
+                mealType = args.mealType,
+                onClose = { navController.popBackStack() }
+            )
         }
     }
 }

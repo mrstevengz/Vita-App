@@ -26,6 +26,7 @@ import com.example.vita_app.ui.components.AppBackground
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.components.HomeTopBar
 import com.example.vita_app.ui.components.MealSection
+import com.example.vita_app.ui.navigation.AddFoodRoute
 import com.example.vita_app.ui.theme.CarbonBlack
 
 
@@ -115,10 +116,14 @@ fun DiaryScreen(name: String, navController: NavHostController) {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Secciones de comidas para insertar meals
-                    MealSection(title = "Breakfast")
-                    MealSection(title = "Lunch")
-                    MealSection(title = "Dinner")
-                    MealSection(title = "Snacks")
+                    // Water no abre AddFoodScreen (se maneja distinto)
+                    val openAddFood: (String) -> Unit = { meal ->
+                        navController.navigate(AddFoodRoute(mealType = meal))
+                    }
+                    MealSection(title = "Breakfast", onAddFoodClick = { openAddFood("Breakfast") })
+                    MealSection(title = "Lunch", onAddFoodClick = { openAddFood("Lunch") })
+                    MealSection(title = "Dinner", onAddFoodClick = { openAddFood("Dinner") })
+                    MealSection(title = "Snacks", onAddFoodClick = { openAddFood("Snacks") })
                     MealSection(title = "Water")
                 }
             }
