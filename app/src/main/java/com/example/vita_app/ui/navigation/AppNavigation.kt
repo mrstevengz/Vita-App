@@ -9,6 +9,7 @@ import com.example.vita_app.ui.screen.home.AddFoodScreen
 import com.example.vita_app.ui.screen.home.DiaryScreen
 import com.example.vita_app.ui.screen.home.HomeScreen
 import com.example.vita_app.ui.screen.home.LoginScreen
+import com.example.vita_app.ui.screen.home.MyMealsScreen
 import com.example.vita_app.ui.screen.home.WelcomeScreen
 import kotlinx.serialization.Serializable
 
@@ -22,6 +23,8 @@ import kotlinx.serialization.Serializable
 @Serializable data class DiaryRoute(val name: String)
 // mealType identifica desde qué sección se abrió (Breakfast, Lunch, Dinner, Snacks)
 @Serializable data class AddFoodRoute(val mealType: String)
+// Pantalla "My Meals" que se abre desde el tab del mismo nombre en AddFoodScreen
+@Serializable data class MyMealsRoute(val mealType: String)
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -72,7 +75,21 @@ fun AppNavigation() {
             val args = backStackEntry.toRoute<AddFoodRoute>()
             AddFoodScreen(
                 mealType = args.mealType,
-                onClose = { navController.popBackStack() }
+                onClose = { navController.popBackStack() },
+                // Al tocar el tab "My Meals" se navega a la pantalla MyMeals
+                onMyMealsTabClick = {
+                    navController.navigate(MyMealsRoute(mealType = args.mealType))
+                }
+            )
+        }
+
+        // 6. My Meals Screen
+        // Reutilizable por tipo de comida (Breakfast, Lunch, Dinner, Snacks)
+        composable<MyMealsRoute> { backStackEntry ->
+            val args = backStackEntry.toRoute<MyMealsRoute>()
+            MyMealsScreen(
+                mealType = args.mealType,
+                onBack = { navController.popBackStack() }
             )
         }
     }

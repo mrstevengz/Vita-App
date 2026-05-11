@@ -53,20 +53,22 @@ import com.example.vita_app.ui.theme.White
 /**
  * Pantalla reutilizable para agregar alimentos a una sección de comida.
  *
- * @param mealType Sección desde donde se abrió (Breakfast, Lunch, Dinner, Snacks).
- *                 Se muestra en la parte superior y permite saber a qué comida agregar.
- * @param onClose  Callback al presionar la X (cerrar y volver al Diary).
+ * @param mealType           Sección desde donde se abrió (Breakfast, Lunch, Dinner, Snacks).
+ *                           Se muestra en la parte superior y permite saber a qué comida agregar.
+ * @param onClose            Callback al presionar la X (cerrar y volver al Diary).
+ * @param onMyMealsTabClick  Callback al tocar el tab "My Meals" (abre la pantalla MyMeals).
  */
 @Composable
 fun AddFoodScreen(
     mealType: String,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onMyMealsTabClick: () -> Unit = {}
 ) {
     // Estado local del input de búsqueda (sin lógica conectada aún)
     var query by remember { mutableStateOf("") }
-    // Tab seleccionado (All, My Meals, My Recipes, My Foods)
+    // Tab seleccionado (All, My Meals)
     var selectedTab by remember { mutableStateOf("All") }
-    val tabs = listOf("All", "My Meals", "My Recipes", "My Foods")
+    val tabs = listOf("All", "My Meals")
 
     AppBackground {
         Column(
@@ -88,11 +90,15 @@ fun AddFoodScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Tabs
+            // Tabs. Si tocan "My Meals" se navega a esa pantalla en lugar de
+            // solo cambiar el estado local.
             TabsRow(
                 tabs = tabs,
                 selected = selectedTab,
-                onSelect = { selectedTab = it }
+                onSelect = { tab ->
+                    if (tab == "My Meals") onMyMealsTabClick()
+                    else selectedTab = tab
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -109,7 +115,6 @@ fun AddFoodScreen(
                     fontSize = 18.sp,
                     color = CarbonBlack
                 )
-                OnlyChip()
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -267,27 +272,6 @@ private fun TabsRow(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun OnlyChip() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .border(1.dp, Color.LightGray, RoundedCornerShape(20.dp))
-            .background(White)
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Default.Verified,
-            contentDescription = null,
-            tint = Color.Gray,
-            modifier = Modifier.size(14.dp)
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text("Only", fontSize = 12.sp, color = CarbonBlack)
     }
 }
 
