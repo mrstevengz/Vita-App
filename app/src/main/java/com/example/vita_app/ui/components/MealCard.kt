@@ -27,7 +27,7 @@ import com.example.vita_app.ui.theme.PineBlue
 import com.example.vita_app.ui.theme.White
 
 @Composable
-fun MealSection(section: String, onButtonClick: (String) -> Unit) {
+fun MealSection(section: String) {
 
     Column(
         modifier = Modifier
@@ -54,7 +54,7 @@ fun MealSection(section: String, onButtonClick: (String) -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .clickable {onButtonClick(section)},
+                    .clickable {TODO()},
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

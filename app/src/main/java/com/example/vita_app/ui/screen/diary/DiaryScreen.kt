@@ -1,5 +1,6 @@
 package com.example.vita_app.ui.screen.diary
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,20 +31,13 @@ import com.example.vita_app.ui.theme.CarbonBlack
 
 
 @Composable
-fun DiaryScreen(name: String, navController: NavHostController, onButtonClick: (String) -> Unit) {
-    Scaffold(
-        // Barra inferior de navegación
-        bottomBar = { BottomBar(navController, name) }
-    ) {
-        innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-
+fun DiaryScreen() {
             AppBackground { // Fondo personalizado de la app
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(10.dp)
+                    modifier = Modifier.fillMaxSize().padding(top = 10.dp)
                 ) {
                     // Barra superior con el nombre del usuario
-                    HomeTopBar(name)
+                    HomeTopBar("Yo")
                     Spacer(modifier = Modifier.height(20.dp))
 
                     // Panel de calorias
@@ -115,14 +109,11 @@ fun DiaryScreen(name: String, navController: NavHostController, onButtonClick: (
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Secciones de comidas para insertar meals
-                    MealSection(section = "Breakfast", onButtonClick = onButtonClick)
-                    MealSection(section = "Lunch",onButtonClick = onButtonClick)
-                    MealSection(section = "Dinner",onButtonClick = onButtonClick)
-                    MealSection(section = "Snacks",onButtonClick = onButtonClick)
-                    MealSection(section = "Water",onButtonClick = onButtonClick)
+                    MealSection(section = "Breakfast")
+                    MealSection(section = "Lunch")
+                    MealSection(section = "Dinner")
+                    MealSection(section = "Snacks")
+                    MealSection(section = "Water")
                 }
             }
         }
-    }
-
-}

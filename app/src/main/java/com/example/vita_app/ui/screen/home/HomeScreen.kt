@@ -1,6 +1,5 @@
 package com.example.vita_app.ui.screen.home
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,18 +36,15 @@ import com.example.vita_app.ui.components.HomeTopBar
 import com.example.vita_app.ui.theme.PineBlue
 
 @Composable
-fun HomeScreen(name: String, navController: NavHostController) {
-    Scaffold(
-        bottomBar = { BottomBar(navController, name) }
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            AppBackground {
-                //Contenido principal de la APP
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(top = 10.dp)
+fun HomeScreen(
+) {
+        //Contenido principal de la APP
+    AppBackground {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(top = 10.dp)
                 ) {
 
-                    HomeTopBar(name) //
+                    HomeTopBar("Yo") //
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -205,10 +201,7 @@ fun HomeScreen(name: String, navController: NavHostController) {
                                     Text("0:45 hr", color = Color.Gray)
                                 }
                             }
-                        }
-                    }
-                }
-            }
+                        } }
         }
     }
 }

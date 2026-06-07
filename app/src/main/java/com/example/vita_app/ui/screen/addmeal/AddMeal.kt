@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.vita_app.ui.components.AppBackground
 
 @Composable
-fun AddMeal(section: String) {
+fun AddMeal() {
     var mealName by remember { mutableStateOf("")}
     var calories by remember {mutableStateOf("")}
 

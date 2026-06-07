@@ -10,7 +10,6 @@ object Welcome
 
 @Serializable
 object Login
-
 @Serializable
 data class Home(val name : String)
 @Serializable
