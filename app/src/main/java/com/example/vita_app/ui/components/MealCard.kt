@@ -1,13 +1,17 @@
 package com.example.vita_app.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -19,9 +23,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vita_app.ui.theme.CarbonBlack
+import com.example.vita_app.ui.theme.PineBlue
+import com.example.vita_app.ui.theme.White
 
 @Composable
-fun MealSection(title: String) {
+fun MealSection(section: String, onButtonClick: (String) -> Unit) {
 
     Column(
         modifier = Modifier
@@ -30,7 +36,7 @@ fun MealSection(title: String) {
     ) {
 
         Text(
-            text = title,
+            text = section,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             color = CarbonBlack
@@ -47,7 +53,8 @@ fun MealSection(title: String) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .clickable {onButtonClick(section)},
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

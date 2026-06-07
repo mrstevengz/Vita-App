@@ -1,10 +1,8 @@
-package com.example.vita_app.ui.screen.home
+package com.example.vita_app.ui.screen.login
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.*
@@ -23,10 +21,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import com.example.vita_app.R
-import com.example.vita_app.ui.theme.BackgroundLight
 import com.example.vita_app.ui.theme.CarbonBlack
 import com.example.vita_app.ui.theme.LightCyan
-import com.example.vita_app.ui.theme.MutedOlive
 import com.example.vita_app.ui.theme.PineBlue
 import com.example.vita_app.ui.theme.SoftTurqoise
 import com.example.vita_app.ui.theme.PastelCyan

@@ -1,4 +1,4 @@
-package com.example.vita_app.ui.screen.home
+package com.example.vita_app.ui.screen.login
 
 
 import androidx.compose.foundation.background
@@ -30,7 +30,7 @@ import com.example.vita_app.ui.theme.White
 
 @Composable
 fun WelcomeScreen(
-    onLoginClick: () -> Unit, // Acción cuando presiona "Iniciar sesión" o "Registrar"
+    onNavigateToLogin: () -> Unit, // Acción cuando presiona "Iniciar sesión" o "Registrar"
     onRegisterClick: () -> Unit
 ) {
     Box(
@@ -80,7 +80,7 @@ fun WelcomeScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(
-                        onClick = onLoginClick,
+                        onClick = onNavigateToLogin,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),

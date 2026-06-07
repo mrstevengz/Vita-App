@@ -1,4 +1,4 @@
-package com.example.vita_app.ui.screen.home
+package com.example.vita_app.ui.screen.diary
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +30,7 @@ import com.example.vita_app.ui.theme.CarbonBlack
 
 
 @Composable
-fun DiaryScreen(name: String, navController: NavHostController) {
+fun DiaryScreen(name: String, navController: NavHostController, onButtonClick: (String) -> Unit) {
     Scaffold(
         // Barra inferior de navegación
         bottomBar = { BottomBar(navController, name) }
@@ -115,11 +115,11 @@ fun DiaryScreen(name: String, navController: NavHostController) {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Secciones de comidas para insertar meals
-                    MealSection(title = "Breakfast")
-                    MealSection(title = "Lunch")
-                    MealSection(title = "Dinner")
-                    MealSection(title = "Snacks")
-                    MealSection(title = "Water")
+                    MealSection(section = "Breakfast", onButtonClick = onButtonClick)
+                    MealSection(section = "Lunch",onButtonClick = onButtonClick)
+                    MealSection(section = "Dinner",onButtonClick = onButtonClick)
+                    MealSection(section = "Snacks",onButtonClick = onButtonClick)
+                    MealSection(section = "Water",onButtonClick = onButtonClick)
                 }
             }
         }
