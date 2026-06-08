@@ -19,18 +19,22 @@ import com.example.vita_app.ui.navigation.Home
 
 @Composable
 fun BottomBar(navController: NavController) {
+    //Se vuelven a llamar las mismas variables del AppNavigation, para saber en que pantalla se esta
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    //Componente default para tener una barra de navegacion abajo
     NavigationBar {
         NavigationBarItem(
+            //El selected pregunta si de todas las rutas que existen, current destination es Home,
+            //si lo es, devuelve el ==true para pasar nulos y hacer que se muestre como seleccionado
             selected = currentDestination?.hierarchy?.any {
                 it.hasRoute(Home::class)
             } == true,
             onClick = { navController.navigate(Home("Yo")) {
-                launchSingleTop = true
-                restoreState = true
-                popUpTo(navController.graph.startDestinationId) {
+                launchSingleTop = true //Hace que solo se guarde una vez la pantalla en el stack
+                restoreState = true // Al regresar a una pantalla con el back, restaurar su scroll/inputs
+                popUpTo(navController.graph.startDestinationId) { //Guardar el estado del tab para luego restaurarlo
                     saveState = true
                 }
             } },

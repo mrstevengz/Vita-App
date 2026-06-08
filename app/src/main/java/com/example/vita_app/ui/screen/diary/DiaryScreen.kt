@@ -36,12 +36,12 @@ import com.example.vita_app.ui.theme.CarbonBlack
 
 @Composable
 fun DiaryScreen(
-    viewModel: MealsViewModel,
+    viewModel: MealsViewModel, //Se manda a llamar el viewmodel de Meals para obtener los metodos
     onAddMealClick: () -> Unit
 ) {
-    val meals = viewModel.meals
+        val meals = viewModel.meals //Se manda a llamar la variable que contiene la lista de meals ya fetcheadas
 
-            AppBackground { // Fondo personalizado de la app
+        AppBackground { // Fondo personalizado de la app
                 Column(
                     modifier = Modifier.fillMaxSize().padding(top = 10.dp)
                 ) {
@@ -49,6 +49,8 @@ fun DiaryScreen(
                     HomeTopBar("Yo")
                     Spacer(modifier = Modifier.height(20.dp))
 
+                    //Uso equivalente a filter en JS, se pasa en el lambda la seccion y meal como (it)
+                    //Se guarda el resultado (un mapa) en la variable grouped
                     val grouped = meals.groupBy{it.section}
 
                     // Panel de calorias
@@ -119,9 +121,14 @@ fun DiaryScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    //Se itera sobre cada entrie o valor en el enum. Por cada tipo que hay se crea un
+                    //componente de MealSection donde se le pasa la seccion arriba, los meals del API
+                    //agrupados por la especifica seccion y una funcion vacia para llamar adentro
                     MealType.entries.forEach{ type ->
                         MealSection(
                             section = type.name,
+                            //Esta linea en especifico, muestra todas las meals por tipo, o ninguna
+                            //si esta vacio
                             meals = grouped[type].orEmpty(),
                             onAddClick = onAddMealClick
                         )

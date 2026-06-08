@@ -38,7 +38,7 @@ import com.example.vita_app.ui.theme.PineBlue
 @Composable
 fun HomeScreen(
 ) {
-        //Contenido principal de la APP
+    //Contenido principal de la APP
     AppBackground {
         Column(
             modifier = Modifier.fillMaxSize().padding(top = 10.dp)

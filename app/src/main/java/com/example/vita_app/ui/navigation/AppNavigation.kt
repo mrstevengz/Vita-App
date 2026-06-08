@@ -29,22 +29,30 @@ fun AppNavigation() {
     //INICIALIZAR NAV CONTROLLER
     val navController = rememberNavController()
 
+    //Recuerda en que pantalla esta la app, vuelve a cambiar cada vez que cambia la pantalla
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    //Llama el navBackStackEntry y dice exactamente el composable en el que esta, no muestra otros argumentos
     val currentDestination = navBackStackEntry?.destination
 
+    //Remember hace que calcule una vez  el destination, algo parecido a useMemo(),
+    // hierarchy chequea todas las rutas existentes, si el destination
+    //esta en la ruta Home o Diary, que actualize la variable a true, y asi se muestra el bottombar
     val showBottomBar = remember(currentDestination) {
         currentDestination?.hierarchy?.any {
             it.hasRoute(Home::class) || it.hasRoute(Diary::class)
-        } == true
+        } == true //== true hace que acepte nulos como verdaderos, ya que puede haber nulos con el ?
     }
 
+    //Se inicializa un viewmodel meals.
     val mealsViewModel: MealsViewModel = viewModel()
 
     Scaffold(
         bottomBar = {
             if (showBottomBar) BottomBar(navController)
         }
-    ) { _ ->
+    ) { _ -> //Ignoro el padding de scaffold con _, para darle su padding propio a todas las pantallas
+        //en AppBackground y que sean consistentes
         NavHost(
             navController = navController,
             startDestination = Welcome,
