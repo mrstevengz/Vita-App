@@ -22,12 +22,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vita_app.data.remote.model.Meal
 import com.example.vita_app.ui.theme.CarbonBlack
 import com.example.vita_app.ui.theme.PineBlue
 import com.example.vita_app.ui.theme.White
 
 @Composable
-fun MealSection(section: String) {
+fun MealSection(
+    section: String,
+    meals: List<Meal> = emptyList(),
+    onAddClick: () -> Unit = {}
+) {
 
     Column(
         modifier = Modifier
@@ -50,11 +55,23 @@ fun MealSection(section: String) {
             modifier = Modifier.fillMaxWidth()
         ) {
 
+            meals.forEach { meal ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(meal.name, color = Color.Black)
+                    Text("${meal.calories.toInt()} cal", color = Color.Gray)
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .clickable {TODO()},
+                    .clickable {onAddClick()},
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

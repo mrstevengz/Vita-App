@@ -2,6 +2,7 @@ package com.example.vita_app.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -47,7 +48,7 @@ fun BottomBar(navController: NavController) {
                     saveState = true
                 }
             } },
-            icon = { Icon(Icons.Default.Book, contentDescription = null) },
+            icon = { Icon(Icons.Default.Dashboard, contentDescription = null) },
             label = { Text("Diary") }
         )
     }

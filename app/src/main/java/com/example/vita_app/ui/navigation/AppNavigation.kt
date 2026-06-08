@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,7 +18,9 @@ import com.example.vita_app.ui.screen.login.LoginScreen
 import com.example.vita_app.ui.screen.login.WelcomeScreen
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.example.vita_app.ui.components.BottomBar
+import com.example.vita_app.ui.screen.addmeal.AddMeal
 import com.example.vita_app.ui.screen.diary.DiaryScreen
+import com.example.vita_app.ui.screen.meals.MealsViewModel
 
 
 @SuppressLint("RestrictedApi")
@@ -34,6 +37,8 @@ fun AppNavigation() {
             it.hasRoute(Home::class) || it.hasRoute(Diary::class)
         } == true
     }
+
+    val mealsViewModel: MealsViewModel = viewModel()
 
     Scaffold(
         bottomBar = {
@@ -78,7 +83,17 @@ fun AppNavigation() {
             }
 
             composable<Diary> {
-                DiaryScreen()
+                DiaryScreen(
+                    viewModel = mealsViewModel,
+                    onAddMealClick = {navController.navigate(AddMeal)}
+                )
+            }
+
+            composable<AddMeal> {
+                AddMeal(
+                    viewModel = mealsViewModel,
+                    onMealAdd = {navController.popBackStack() }
+                )
             }
         }
     }

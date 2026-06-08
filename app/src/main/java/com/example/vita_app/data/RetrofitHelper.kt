@@ -3,7 +3,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitHelper {
-    private val baseUrl = "http://localhost:5000/api/"
+    private val baseUrl = "http://10.0.2.2:5000/api/"
 
     private var instance: Retrofit? = null
 

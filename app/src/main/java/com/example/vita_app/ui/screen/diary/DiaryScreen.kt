@@ -1,5 +1,6 @@
 package com.example.vita_app.ui.screen.diary
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,15 +24,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.vita_app.data.remote.model.Meal
+import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.ui.components.AppBackground
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.components.HomeTopBar
 import com.example.vita_app.ui.components.MealSection
+import com.example.vita_app.ui.screen.meals.MealsViewModel
 import com.example.vita_app.ui.theme.CarbonBlack
 
 
 @Composable
-fun DiaryScreen() {
+fun DiaryScreen(
+    viewModel: MealsViewModel,
+    onAddMealClick: () -> Unit
+) {
+    val meals = viewModel.meals
+
             AppBackground { // Fondo personalizado de la app
                 Column(
                     modifier = Modifier.fillMaxSize().padding(top = 10.dp)
@@ -39,6 +48,8 @@ fun DiaryScreen() {
                     // Barra superior con el nombre del usuario
                     HomeTopBar("Yo")
                     Spacer(modifier = Modifier.height(20.dp))
+
+                    val grouped = meals.groupBy{it.section}
 
                     // Panel de calorias
                     Card(
@@ -108,12 +119,14 @@ fun DiaryScreen() {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Secciones de comidas para insertar meals
-                    MealSection(section = "Breakfast")
-                    MealSection(section = "Lunch")
-                    MealSection(section = "Dinner")
-                    MealSection(section = "Snacks")
-                    MealSection(section = "Water")
+                    MealType.entries.forEach{ type ->
+                        MealSection(
+                            section = type.name,
+                            meals = grouped[type].orEmpty(),
+                            onAddClick = onAddMealClick
+                        )
+                    }
+
                 }
             }
         }
