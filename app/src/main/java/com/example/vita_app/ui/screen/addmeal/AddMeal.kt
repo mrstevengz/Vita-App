@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.ui.components.AppBackground
 import com.example.vita_app.ui.screen.meals.MealsViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 
 @Composable
 fun AddMeal(viewModel: MealsViewModel, onMealAdd: () -> Unit) {

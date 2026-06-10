@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.vita_app.data.remote.model.Meal
 import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.data.repository.MealRepo
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class MealsViewModel: ViewModel() {
@@ -14,6 +16,8 @@ class MealsViewModel: ViewModel() {
     private val repo = MealRepo()
 
     val meals = mutableStateListOf<Meal>()
+    private val _events = Channel<String>()
+    val events = _events.receiveAsFlow()
 
     //Cuando se inicializa la clase, siempre va a cargar la lista de Meals del API
     init {
@@ -60,8 +64,28 @@ class MealsViewModel: ViewModel() {
                 // wasteful hacer un HTTP request extra
                 //todo: Cambiar esto y buscar una mejor alternativa, talvez guardarlo localmente primero?
                 loadMeals()
+                _events.send("Meal added")
             } catch(e: Exception) {
                 println("Fallo al agregar meal: ${e.message}")
+                _events.send("Error saving the meal")
+            }
+        }
+    }
+
+    fun deleteMeal(id : Int) {
+        //Se manda a llamar el metodo de deleteMeal del repositorio, se le pasa el ID y borra todos los meals que
+        // coincidan con el ID (solo puede ser 1 al ser unico). Esto se hace con el fin de agilizar la actualizacion del
+        //UI para el usuario.
+        /*todo BUSCAR UNA MANERA DE OPTIMIZAR ESTE METODO: UNA OPCION ES BORRAR LOCALMENTE EL ROW PARA EL USUARIO, Y LUEGO
+        *  BORRAR EL REQUEST, EN CASO DE QUE FALLE SE PODRIA VOLVER A PONER EL ROW EN EL UI. */
+        viewModelScope.launch {
+            try {
+                repo.deleteMeal(id)
+                meals.removeAll {it.id == id}
+                _events.send("Meal deleted")
+            } catch (ex: Exception) { // restore on failure
+                println("Fallo al eliminar meal: ${ex.message}")
+                _events.send("Error deleting the meal")
             }
         }
     }

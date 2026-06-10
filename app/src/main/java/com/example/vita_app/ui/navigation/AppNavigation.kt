@@ -3,7 +3,10 @@ package com.example.vita_app.ui.navigation
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -29,6 +32,8 @@ fun AppNavigation() {
     //INICIALIZAR NAV CONTROLLER
     val navController = rememberNavController()
 
+
+
     //Recuerda en que pantalla esta la app, vuelve a cambiar cada vez que cambia la pantalla
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
@@ -47,7 +52,16 @@ fun AppNavigation() {
     //Se inicializa un viewmodel meals.
     val mealsViewModel: MealsViewModel = viewModel()
 
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
+    LaunchedEffect(Unit) {
+        mealsViewModel.events.collect { message -> snackbarHostState.showSnackbar(message) }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState)},
         bottomBar = {
             if (showBottomBar) BottomBar(navController)
         }

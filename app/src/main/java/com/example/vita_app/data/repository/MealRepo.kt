@@ -24,6 +24,9 @@ class MealRepo {
     }
 
     suspend fun deleteMeal(id: Int) {
-        return api.deleteMeal(id)
+        val res = api.deleteMeal(id)
+        if(!res.isSuccessful) {
+            throw Exception("Delete failed: ${res.code()}")
+        }
     }
 }
