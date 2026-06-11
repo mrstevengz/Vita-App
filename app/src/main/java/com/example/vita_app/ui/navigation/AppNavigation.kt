@@ -20,9 +20,11 @@ import com.example.vita_app.ui.screen.home.HomeScreen
 import com.example.vita_app.ui.screen.login.LoginScreen
 import com.example.vita_app.ui.screen.login.WelcomeScreen
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.toRoute
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.screen.addmeal.AddMeal
 import com.example.vita_app.ui.screen.diary.DiaryScreen
+import com.example.vita_app.ui.screen.editmeal.EditMealScreen
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 
 
@@ -107,7 +109,8 @@ fun AppNavigation() {
             composable<Diary> {
                 DiaryScreen(
                     viewModel = mealsViewModel,
-                    onAddMealClick = {navController.navigate(AddMeal)}
+                    onAddMealClick = {navController.navigate(AddMeal)},
+                    onMealEditClick = {id -> navController.navigate(EditMeal(id))}
                 )
             }
 
@@ -115,6 +118,16 @@ fun AppNavigation() {
                 AddMeal(
                     viewModel = mealsViewModel,
                     onMealAdd = {navController.popBackStack() }
+                )
+            }
+
+            //Pantalla de Edit
+            composable<EditMeal> {
+                entry -> val args = entry.toRoute<EditMeal>()
+                EditMealScreen(
+                    vm = mealsViewModel,
+                    mealId = args.mealId,
+                    onCompleted = {navController.popBackStack()}
                 )
             }
         }

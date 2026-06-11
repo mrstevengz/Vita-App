@@ -39,7 +39,8 @@ import com.example.vita_app.ui.theme.CarbonBlack
 @Composable
 fun DiaryScreen(
     viewModel: MealsViewModel, //Se manda a llamar el viewmodel de Meals para obtener los metodos
-    onAddMealClick: () -> Unit
+    onAddMealClick: () -> Unit,
+    onMealEditClick: (Int) -> Unit
 ) {
     val meals =
         viewModel.meals //Se manda a llamar la variable que contiene la lista de meals ya fetcheadas
@@ -140,7 +141,8 @@ fun DiaryScreen(
                         //si esta vacio
                         meals = grouped[type].orEmpty(),
                         onAddClick = onAddMealClick,
-                        onMealDelete = { meal -> meal.id?.let { viewModel.deleteMeal(it) } }
+                        onMealDelete = { meal -> meal.id?.let { viewModel.deleteMeal(it) } },
+                        onMealClick = {meal -> meal.id?.let {onMealEditClick(it)}}
                 )
             }
 

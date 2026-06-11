@@ -42,7 +42,8 @@ fun MealSection(
     section: String,
     meals: List<Meal> = emptyList(),
     onAddClick: () -> Unit = {},
-    onMealDelete: (Meal) -> Unit = {}
+    onMealDelete: (Meal) -> Unit = {},
+    onMealClick: (Meal) -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         Text(section, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = CarbonBlack)
@@ -60,7 +61,7 @@ fun MealSection(
             Column {
                 meals.forEach { meal ->
                     key(meal.id) {
-                        MealRow(meal = meal, onDelete = onMealDelete)
+                        MealRow(meal = meal, onDelete = onMealDelete, onClick = onMealClick)
                     }
                 }
             }
@@ -83,7 +84,7 @@ fun MealSection(
 
 //Se crea un private row donde se le otorga un swipe, un lambda para pasar un meal y realizar una accion (delete) y el UI
 @Composable
-private fun MealRow(meal: Meal, onDelete: (Meal) -> Unit) {
+private fun MealRow(meal: Meal, onDelete: (Meal) -> Unit, onClick: (Meal) -> Unit) {
     //Se crea un SwipeToDismissBoxState Object
     val dismissState = rememberSwipeToDismissBoxState()
 
@@ -114,7 +115,9 @@ private fun MealRow(meal: Meal, onDelete: (Meal) -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(vertical = 12.dp, horizontal = 8.dp),
+                .padding(vertical = 12.dp, horizontal = 8.dp)
+                .clickable{onClick(meal)},
+
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {

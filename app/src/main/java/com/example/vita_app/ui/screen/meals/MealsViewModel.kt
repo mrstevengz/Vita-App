@@ -89,4 +89,17 @@ class MealsViewModel: ViewModel() {
             }
         }
     }
+
+    fun updateMeal(id:Int, updated: Meal) {
+        viewModelScope.launch {
+            try {
+                //Se g
+                val result = repo.updateMeal(id, updated)
+                val idx = meals.indexOfFirst { it.id == id }
+                if (idx != -1) meals[idx] = result
+            } catch (ex: Exception) {
+                println("Fallo al editar meal: ${ex.message}")
+            }
+        }
+    }
 }
