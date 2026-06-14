@@ -97,8 +97,10 @@ class MealsViewModel: ViewModel() {
                 val result = repo.updateMeal(id, updated)
                 val idx = meals.indexOfFirst { it.id == id }
                 if (idx != -1) meals[idx] = result
+                _events.send("Meal updated")
             } catch (ex: Exception) {
                 println("Fallo al editar meal: ${ex.message}")
+                _events.send("Error updating the meal")
             }
         }
     }
