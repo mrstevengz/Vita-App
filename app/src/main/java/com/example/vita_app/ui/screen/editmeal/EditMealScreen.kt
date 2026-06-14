@@ -7,9 +7,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -57,8 +62,21 @@ fun EditMealScreen(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            CenterAlignedTopAppBar()
-
+            CenterAlignedTopAppBar(
+                title = {Text("Editar meal")},
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Navegar hacia atras")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onCompleted) {
+                        Icon(imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Confirmar meal")
+                    }
+                }
+            )
 
             TextField(value = name, onValueChange = {name = it}, label = {Text("Name")}, modifier = Modifier.fillMaxWidth())
 
