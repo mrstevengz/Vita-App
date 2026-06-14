@@ -103,7 +103,9 @@ fun AppNavigation() {
 
             //Pantalla de Home
             composable<Home> {
-                HomeScreen()
+                HomeScreen(
+                    onCalorieCardClick = {navController.navigate(Diary(""))}
+                )
             }
 
             composable<Diary> {
@@ -127,7 +129,8 @@ fun AppNavigation() {
                 EditMealScreen(
                     vm = mealsViewModel,
                     mealId = args.mealId,
-                    onCompleted = {navController.popBackStack()}
+                    onCompleted = {navController.popBackStack()},
+                    onBack = {navController.popBackStack()}
                 )
             }
         }
