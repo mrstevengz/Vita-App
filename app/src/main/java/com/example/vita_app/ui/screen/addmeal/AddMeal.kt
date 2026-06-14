@@ -63,6 +63,7 @@ fun AddMeal(viewModel: MealsViewModel, onMealAdd: () -> Unit) {
 
             Text("Section")
 
+            //todo En esta pantalla, en celulares con menor resolucion / texto mas grande se comprime. Mejor un bar de seleccion que baje y se pueda ver desde ahi
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 MealType.entries.forEach {
                     type ->

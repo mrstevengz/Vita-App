@@ -30,7 +30,7 @@ import com.example.vita_app.ui.theme.White
 
 @Composable
 fun LoginScreen(onLoginSuccess: (String) -> Unit) {
-
+//todo Al abrir el teclado, se esconden los fields y es mal user experience
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
