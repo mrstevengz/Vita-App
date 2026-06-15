@@ -146,7 +146,8 @@ fun EditMealScreen(
                 //Flowrow es un row que wrappea en caso de se salga de la pantalla
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     MealType.entries.forEach { type ->
-                        //Filterchip
+                        //Filterchip pide una seleccion y una funcion al clickear, es buen fit para la funcion.
+                        //Establece la section como el tipo de seleccion, y al clickear selecciona esa section
                         FilterChip(
                             selected = section == type,
                             onClick = {section = type},

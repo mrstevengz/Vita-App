@@ -119,7 +119,8 @@ fun AppNavigation() {
             composable<AddMeal> {
                 AddMeal(
                     viewModel = mealsViewModel,
-                    onMealAdd = {navController.popBackStack() }
+                    onMealAdd = {navController.popBackStack() },
+                    onBack = {navController.popBackStack()}
                 )
             }
 

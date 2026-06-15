@@ -41,6 +41,7 @@ fun HomeScreen(
 ) {
     //Contenido principal de la APP
     AppBackground {
+
         Column(
             modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
                 ) {
