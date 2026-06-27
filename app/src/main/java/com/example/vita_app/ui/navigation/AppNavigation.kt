@@ -25,6 +25,7 @@ import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.screen.addmeal.AddMeal
 import com.example.vita_app.ui.screen.diary.DiaryScreen
 import com.example.vita_app.ui.screen.editmeal.EditMealScreen
+import com.example.vita_app.ui.screen.login.RegisterScreen
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 
 
@@ -82,11 +83,31 @@ fun AppNavigation() {
                         navController.navigate(Login) //Navega a la pantalla de Login
                     },
                     onRegisterClick = {
-                        Unit //Falta la pantalla de registro y auth (lo dejo para el final)
+                        navController.navigate(Register)
                     }
                 )
             }
 
+            //Pantalla de Registro
+
+            composable<Register> {
+                RegisterScreen(
+                    onRegisterSuccess = { name ->
+                        navController.navigate(Home(name = name)) {
+                            popUpTo(Welcome) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    onNavigateToLogin = {
+                        navController.navigate(Login) {
+                            popUpTo(Register) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
             //Pantalla de Login
 
             composable<Login> {

@@ -2,10 +2,16 @@ package com.example.vita_app.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 
-data class Workout(
-    @SerializedName("id")             val id: Int,
+data class WorkoutResponse(
+    @SerializedName("id") val id: Int,
+    @SerializedName("name") val name: String,
+    @SerializedName("caloriesPerHour") val caloriesPerHour: String,
+    @SerializedName("description") val description: String,
+)
 
-    @SerializedName("name")           val name: String,
+data class WorkoutRequest(
+    @SerializedName("name") val name: String,
+    @SerializedName("caloriesPerHour") val caloriesPerHour: String,
+    @SerializedName("description") val description: String
 
-    @SerializedName("caloriesPerHour")        val minutes: Double,
 )

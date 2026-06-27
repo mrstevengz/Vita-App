@@ -10,23 +10,4 @@ class MealRepo {
     suspend fun getMeals(): List<Meal> {
         return api.getMeals()
     }
-
-    suspend fun getMealById(id: Int): Meal {
-        return api.getMealsById(id)
-    }
-
-    suspend fun createMeal(meal : Meal) : Meal {
-        return api.createMeal(meal)
-    }
-
-    suspend fun updateMeal(id: Int, meal: Meal): Meal {
-        return api.updateMeal(id, meal)
-    }
-
-    suspend fun deleteMeal(id: Int) {
-        val res = api.deleteMeal(id)
-        if(!res.isSuccessful) {
-            throw Exception("Delete failed: ${res.code()}")
-        }
-    }
 }

@@ -9,6 +9,8 @@ import kotlinx.serialization.Serializable
 object Welcome
 
 @Serializable
+object Register
+@Serializable
 object Login
 @Serializable
 data class Home(val name : String)
