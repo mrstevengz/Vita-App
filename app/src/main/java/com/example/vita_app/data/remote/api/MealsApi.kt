@@ -1,6 +1,7 @@
 package com.example.vita_app.data.remote.api
 
 import com.example.vita_app.data.remote.model.Meal
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -36,5 +37,5 @@ interface MealsApi {
     @DELETE("meals/{id}")
     suspend fun deleteMeal(
         @Path("id") id: Int
-    )
+    ): Response<Unit>
 }

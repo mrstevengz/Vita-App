@@ -12,8 +12,11 @@ object Welcome
 object Login
 @Serializable
 data class Home(val name : String)
+
 @Serializable
 data class Diary(val name : String)
 
 @Serializable
 object AddMeal
+@Serializable
+data class EditMeal(val mealId: Int)
