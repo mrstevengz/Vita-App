@@ -3,8 +3,10 @@ package com.example.vita_app.ui.screen.meals
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vita_app.data.remote.model.DiaryEntry
 import com.example.vita_app.data.remote.model.Meal
 import com.example.vita_app.data.remote.model.MealType
+import com.example.vita_app.data.repository.EntryRepo
 import com.example.vita_app.data.repository.MealRepo
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -13,15 +15,18 @@ import kotlinx.coroutines.launch
 class MealsViewModel: ViewModel() {
     //Se inicializa una instancia del repositorio del api, y un array de Meal's para guardarlo en
     // las pantallas y mostrarlo
-    private val repo = MealRepo()
+    private val mealRepo = MealRepo()
+    private val entryRepo = EntryRepo()
 
     val meals = mutableStateListOf<Meal>()
+    val entries = mutableStateListOf<DiaryEntry>()
     private val _events = Channel<String>()
     val events = _events.receiveAsFlow()
 
     //Cuando se inicializa la clase, siempre va a cargar la lista de Meals del API
     init {
         loadMeals()
+        loadEntries()
     }
 
     //Funcion para cargar los meals existentes.
@@ -30,7 +35,7 @@ class MealsViewModel: ViewModel() {
             //Try Catch para excepciones al cargar
             try {
                 //Manda a llamar la funcion de getMeals al API, y guarda la lista en la lista anterior
-                val mealsApi = repo.getMeals()
+                val mealsApi = mealRepo.getMeals()
                 //Se limpia la lista antes de llenarla con la informacion del API.
                 //En caso de duplicados, se agregaria informacion encima de estos repetida, por eso se limpia
                 meals.clear()
@@ -40,6 +45,19 @@ class MealsViewModel: ViewModel() {
             }
         }
     }
+    fun loadEntries() {
+        viewModelScope.launch {
+            try {
+                val data = entryRepo.getEntries()
+                entries.clear()
+                entries.addAll(data)
+            }catch (e: Exception) {
+                println("Fallo al cargar el diario: ${e.message}")
+            }
+        }
+    }
+
+    // -- Acciones del diario ------------------
 
     fun addMeal(name: String, calories: Double, section: MealType) {
         viewModelScope.launch {

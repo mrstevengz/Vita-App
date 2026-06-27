@@ -2,18 +2,19 @@ package com.example.vita_app.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 
-data class Meal(
-    @SerializedName("id")         val id: Int? = null,
+data class MealResponse(
+    @SerializedName("id") val id: Int,
+    @SerializedName("name") val name: String,
+    @SerializedName("calories") val calories: String,
+    @SerializedName("carbs") val carbs: String,
+    @SerializedName("fat") val fat: String,
+    @SerializedName("protein") val protein: String,
+)
 
-    @SerializedName("name")       val name: String,
-
-    @SerializedName("calories")   val calories: Double,
-
-    @SerializedName("fat")        val fat: Double = 0.0,
-
-    @SerializedName("protein")    val protein: Double = 0.0,
-
-    @SerializedName("directions") val directions: String = "",
-
-    @SerializedName("section") val section: MealType
+data class MealRequest(
+    @SerializedName("name") val name: String,
+    @SerializedName("calories") val calories: String,
+    @SerializedName("carbs") val carbs: String,
+    @SerializedName("fat") val fat: String,
+    @SerializedName("protein") val protein: String,
 )
