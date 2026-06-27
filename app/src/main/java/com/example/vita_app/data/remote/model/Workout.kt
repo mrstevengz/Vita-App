@@ -7,9 +7,5 @@ data class Workout(
 
     @SerializedName("name")           val name: String,
 
-    @SerializedName("minutes")        val minutes: Double,
-
-    @SerializedName("caloriesBurned") val caloriesBurned: Double,
-
-    @SerializedName("description")    val description: String
+    @SerializedName("caloriesPerHour")        val minutes: Double,
 )

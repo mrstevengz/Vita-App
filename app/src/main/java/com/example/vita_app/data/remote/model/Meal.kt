@@ -9,11 +9,10 @@ data class Meal(
 
     @SerializedName("calories")   val calories: Double,
 
+    @SerializedName("carbs")        val carbs: Double = 0.0,
+
     @SerializedName("fat")        val fat: Double = 0.0,
 
     @SerializedName("protein")    val protein: Double = 0.0,
-
-    @SerializedName("directions") val directions: String = "",
-
-    @SerializedName("section") val section: MealType
 )
+
