@@ -18,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,12 +39,16 @@ fun DiaryScreen(
     onAddMealClick: () -> Unit,
     onMealEditClick: (Int) -> Unit
 ) {
-    val meals =
-        viewModel.meals //Se manda a llamar la variable que contiene la lista de meals ya fetcheadas
+    LaunchedEffect(Unit) {
+        viewModel.loadEntries()
+    }
+
+    val entries =
+        viewModel.entries//Se manda a llamar la variable que contiene la lista de meals ya fetcheadas
 
     //Uso equivalente a filter en JS, se pasa en el lambda la seccion y meal como (it)
     //Se guarda el resultado (un mapa) en la variable grouped
-    val grouped = meals.groupBy { it.section }
+    val grouped = entries.groupBy { it.section }
 
     AppBackground { // Fondo personalizado de la app
         LazyColumn(
@@ -132,13 +137,11 @@ fun DiaryScreen(
             )
             { type ->
                 MealSection(
-                        section = type.name,
-                        //Esta linea en especifico, muestra todas las meals por tipo, o ninguna
-                        //si esta vacio
-                        meals = grouped[type].orEmpty(),
-                        onAddClick = onAddMealClick,
-                        onMealDelete = { meal -> meal.id?.let { viewModel.deleteMeal(it) } },
-                        onMealClick = {meal -> meal.id?.let {onMealEditClick(it)}}
+                    section = type.name,
+                    entries = grouped[type].orEmpty(),
+                    onAddClick = onAddMealClick,
+                    onEntryDelete = {entry -> viewModel.deleteEntry(entry.id)},
+                    onEntryClick = {entry -> onMealEditClick(entry.id)}
                 )
             }
 

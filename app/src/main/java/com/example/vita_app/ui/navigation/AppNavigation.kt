@@ -23,10 +23,16 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.toRoute
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.screen.addmeal.AddMeal
+import com.example.vita_app.ui.screen.catalog.CatalogScreen
 import com.example.vita_app.ui.screen.diary.DiaryScreen
 import com.example.vita_app.ui.screen.editmeal.EditMealScreen
+import com.example.vita_app.ui.screen.login.AuthEvent
+import com.example.vita_app.ui.screen.login.AuthViewModel
 import com.example.vita_app.ui.screen.login.RegisterScreen
 import com.example.vita_app.ui.screen.meals.MealsViewModel
+import com.example.vita_app.ui.screen.workouts.WorkoutCatalogScreen
+import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
+import java.util.Map.entry
 
 
 @SuppressLint("RestrictedApi")
@@ -54,6 +60,8 @@ fun AppNavigation() {
 
     //Se inicializa un viewmodel meals.
     val mealsViewModel: MealsViewModel = viewModel()
+    val workoutsViewModel: WorkoutViewModel = viewModel()
+
 
     val snackbarHostState = remember {
         SnackbarHostState()
@@ -111,37 +119,61 @@ fun AppNavigation() {
             //Pantalla de Login
 
             composable<Login> {
-                LoginScreen(
-                    onLoginSuccess = {
-                        navController.navigate(Home(name = "Steven")) {
-                            popUpTo(Welcome) {
-                                inclusive = true
-                            } //Limpia el stack para que no se pueda regresar despues de entrar a Home
+                val authViewModel: AuthViewModel = viewModel()
+
+                LaunchedEffect(Unit) {
+                    authViewModel.events.collect { event ->
+                        when(event) {
+                            is AuthEvent.Success ->
+                                navController.navigate(Home(name = event.name)) {
+                                    popUpTo(Welcome) {inclusive = true}
+                                }
+                            is AuthEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
                         }
                     }
-                )
+                }
+                LoginScreen(viewModel = authViewModel)
             }
 
             //Pantalla de Home
             composable<Home> {
                 HomeScreen(
-                    onCalorieCardClick = {navController.navigate(Diary(""))}
+                    onCalorieCardClick = {navController.navigate(Diary(""))},
+                    onWorkoutCardClick = {navController.navigate(WorkoutCatalog)}
                 )
             }
 
             composable<Diary> {
                 DiaryScreen(
                     viewModel = mealsViewModel,
-                    onAddMealClick = {navController.navigate(AddMeal)},
+                    onAddMealClick = {navController.navigate(Catalog)},
                     onMealEditClick = {id -> navController.navigate(EditMeal(id))}
                 )
             }
 
-            composable<AddMeal> {
+            composable<Catalog> {
+                CatalogScreen(
+                    viewModel = mealsViewModel,
+                    onMealClick = { id ->
+                        navController.navigate(AddMeal(id))
+                    },
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable<AddMeal> { entry ->
+                val args = entry.toRoute<AddMeal>()
                 AddMeal(
                     viewModel = mealsViewModel,
-                    onMealAdd = {navController.popBackStack() },
-                    onBack = {navController.popBackStack()}
+                    mealId = args.mealId,
+                    onMealAdd = {
+                        navController.popBackStack(Catalog, inclusive = true)
+                    },
+                    onBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
 
@@ -150,9 +182,23 @@ fun AppNavigation() {
                 entry -> val args = entry.toRoute<EditMeal>()
                 EditMealScreen(
                     vm = mealsViewModel,
-                    mealId = args.mealId,
+                    entryId = args.mealId,
                     onCompleted = {navController.popBackStack()},
                     onBack = {navController.popBackStack()}
+                )
+            }
+
+            //Workouts
+            
+            composable<WorkoutCatalog> {
+                WorkoutCatalogScreen(
+                    viewModel = workoutsViewModel,
+                    onWorkoutClick = {
+                        TODO()
+                    },
+                    onBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
         }

@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vita_app.data.remote.model.Meal
+import com.example.vita_app.data.remote.model.DiaryEntryResponse
 import com.example.vita_app.ui.theme.CarbonBlack
 
 
@@ -40,10 +40,10 @@ fun MealSection(
     /*La seccion de meal tiene como parametros su seccion especifica, la lista de meals que empiezan vacias,
     * y una funcion para cuando se cliquee (abre addmeal) y cuando se desea borrar por medio de un swipe*/
     section: String,
-    meals: List<Meal> = emptyList(),
+    entries: List<DiaryEntryResponse> = emptyList(),
     onAddClick: () -> Unit = {},
-    onMealDelete: (Meal) -> Unit = {},
-    onMealClick: (Meal) -> Unit = {}
+    onEntryDelete: (DiaryEntryResponse) -> Unit = {},
+    onEntryClick: (DiaryEntryResponse) -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         Text(section, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = CarbonBlack)
@@ -59,9 +59,9 @@ fun MealSection(
             /*SE REALIZA UN CARD DENTRO DE LA COLUMNA DE SECCION, donde por cada meal adentro de una seccion, se le otorga
             * una llave (que es su ID) y se crea un MealRow con funcionalidad de swipe */
             Column {
-                meals.forEach { meal ->
-                    key(meal.id) {
-                        MealRow(meal = meal, onDelete = onMealDelete, onClick = onMealClick)
+                entries.forEach { entry ->
+                    key(entry.id) {
+                        EntryRow(entry = entry, onDelete = onEntryDelete, onClick = onEntryClick)
                     }
                 }
             }
@@ -84,7 +84,7 @@ fun MealSection(
 
 //Se crea un private row donde se le otorga un swipe, un lambda para pasar un meal y realizar una accion (delete) y el UI
 @Composable
-private fun MealRow(meal: Meal, onDelete: (Meal) -> Unit, onClick: (Meal) -> Unit) {
+private fun EntryRow(entry: DiaryEntryResponse, onDelete: (DiaryEntryResponse) -> Unit, onClick: (DiaryEntryResponse) -> Unit) {
     //Se crea un SwipeToDismissBoxState Object
     val dismissState = rememberSwipeToDismissBoxState()
 
@@ -92,9 +92,16 @@ private fun MealRow(meal: Meal, onDelete: (Meal) -> Unit, onClick: (Meal) -> Uni
     //para borrar el row especifico
     LaunchedEffect(dismissState.currentValue) {
         if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            onDelete(meal)
+            onDelete(entry)
         }
     }
+
+    //Calorias de la entrada = calorias por 100g
+    val per100 = entry.meal.calories.toDoubleOrNull() ?: 0.0
+    //Gramos del meal
+    val grams = entry.grams.toDoubleOrNull() ?: 0.0
+    //Calorias totales = calorias * gramos / 100
+    val totalCal = (per100 * grams / 100.0).toInt()
 
     //En el objeto se le asigna un estado (dismiss state), se desactiva la opcion para hacer swipe de derecha a izquierda,
     // y se le da un diseño. Es el que esta debajo del row y lo que se mira al hacerle swipe
@@ -116,13 +123,18 @@ private fun MealRow(meal: Meal, onDelete: (Meal) -> Unit, onClick: (Meal) -> Uni
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(vertical = 12.dp, horizontal = 8.dp)
-                .clickable{onClick(meal)},
+                .clickable{onClick(entry)},
 
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(meal.name)
-            Text("${meal.calories.toInt()}", color = Color.Gray)
+            // Izquierda: nombre (del catálogo) + gramos
+            Column {
+                Text(entry.meal.name, fontWeight = FontWeight.Medium)
+                Text("${grams.toInt()} g", fontSize = 12.sp, color = Color.Gray)
+            }
+            // Derecha: calorías calculadas
+            Text("$totalCal cal", color = Color.Gray)
+        }
         }
     }
-}

@@ -44,45 +44,34 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.ui.components.AppBackground
+import com.example.vita_app.ui.components.MacroPreview
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditMealScreen(
     vm: MealsViewModel,
-    mealId: Int,
+    entryId: Int,
     onCompleted: () -> Unit,
     onBack: () -> Unit
 ) {
 
     //Busca el meal especifico en la lista de meals del VM, basado en la id que se le pasa en diaryscreen
-    val meal = vm.meals.find { it.id == mealId }
+    val entry = vm.entries.find { it.id == entryId }
 
-    if(meal == null) {
+    if(entry == null) {
         Text("Meal not found")
         return
     }
 
     //Inicializacion de variables ya rellenadas (mutableStateOf)
-    var name by remember { mutableStateOf(meal.name) }
-    var calories by remember { mutableStateOf(meal.calories.toString()) }
-    var fat by remember { mutableStateOf(meal.fat.toString()) }
-    var protein by remember { mutableStateOf(meal.protein.toString()) }
-    var directions by remember { mutableStateOf(meal.directions) }
-    var section by remember { mutableStateOf(meal.section) }
+    var grams by remember {mutableStateOf(entry.grams)}
+    var section by remember {mutableStateOf(entry.section)}
 
     //Variable sencilla para almacenar y mandar a llamar el update, se le tienen que pasar todos los datos
     val saveMeal = {
-        val updated = meal.copy(
-            name = name,
-            calories = calories.toDoubleOrNull() ?: meal.calories,
-            fat = fat.toDoubleOrNull() ?: meal.fat,
-            protein = protein.toDoubleOrNull() ?: meal.protein,
-            directions = directions,
-            section = section,
-        )
         //Llamada a la funcion, le pasa el id y la variable con el meal
-        vm.updateMeal(mealId, updated)
+        vm.updateEntry(entryId, grams, section)
         //Llama a la funcion onCompleted que se le pasa
         onCompleted()
     }
@@ -91,7 +80,7 @@ fun EditMealScreen(
         //Top Bar transparente arriba
         Column(modifier = Modifier.fillMaxSize()) {
             CenterAlignedTopAppBar(
-                title = {Text("Editar meal")},
+                title = {Text("Editar entrada")},
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -101,7 +90,7 @@ fun EditMealScreen(
                 actions = {
                     IconButton(onClick = saveMeal) {
                         Icon(imageVector = Icons.Default.CheckCircle,
-                            contentDescription = "Confirmar meal")
+                            contentDescription = "Confirmar")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -113,45 +102,26 @@ fun EditMealScreen(
                 modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                OutlinedTextField(                                   // 3
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Name") },
+                Text("Food: ${entry.meal.name}", style = MaterialTheme.typography.titleMedium)
+
+                OutlinedTextField(
+                    value = grams,
+                    onValueChange = { grams = it },
+                    label = { Text("Grams") },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedTextField(
-                        value = calories, onValueChange = { calories = it },
-                        label = { Text("Cal") }, singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = fat, onValueChange = { fat = it },
-                        label = { Text("Fat") }, singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = protein, onValueChange = { protein = it },
-                        label = { Text("Protein") }, singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                MacroPreview(meal = entry.meal, grams = grams)
 
                 Text("Section", style = MaterialTheme.typography.labelLarge)
-                //Flowrow es un row que wrappea en caso de se salga de la pantalla
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     MealType.entries.forEach { type ->
-                        //Filterchip pide una seleccion y una funcion al clickear, es buen fit para la funcion.
-                        //Establece la section como el tipo de seleccion, y al clickear selecciona esa section
                         FilterChip(
                             selected = section == type,
-                            onClick = {section = type},
-                            label = {Text(type.name)}
+                            onClick = { section = type },
+                            label = { Text(type.name) }
                         )
                     }
                 }
@@ -159,3 +129,4 @@ fun EditMealScreen(
         }
     }
     }
+

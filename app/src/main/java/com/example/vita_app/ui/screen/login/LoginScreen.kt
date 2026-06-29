@@ -29,9 +29,8 @@ import com.example.vita_app.ui.theme.PastelCyan
 import com.example.vita_app.ui.theme.White
 
 @Composable
-fun LoginScreen(onLoginSuccess: (String) -> Unit) {
-//todo Al abrir el teclado, se esconden los fields y es mal user experience
-    var username by remember { mutableStateOf("") }
+fun LoginScreen(viewModel: AuthViewModel) {
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     // Contenedor principal
@@ -101,9 +100,9 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                     Spacer(modifier = Modifier.height(20.dp))
 
                     OutlinedTextField(
-                        value = username,
-                        onValueChange = { username = it },    // Guarda lo que el usuario escribe
-                        placeholder = { Text("Username") },
+                        value = email,
+                        onValueChange = { email = it },    // Guarda lo que el usuario escribe
+                        placeholder = { Text("Email") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         singleLine = true
@@ -177,10 +176,11 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                     Button(
                         onClick = {
                             // Solo permite continuar si hay username
-                            if (username.isNotEmpty()) {
-                                onLoginSuccess(username) // Llama a la navegación (pantalla Home)
+                            if (email.isNotEmpty() && password.isNotEmpty()) {
+                                viewModel.login(email, password) // Llama a la navegación (pantalla Home)
                             }
                         },
+                        enabled = !viewModel.isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -189,7 +189,15 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                             containerColor = PineBlue
                         )
                     ) {
-                        Text("Login", color = White)
+                        if (viewModel.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = White,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text("Login", color = White)
+                        }
                     }
                 }
             }

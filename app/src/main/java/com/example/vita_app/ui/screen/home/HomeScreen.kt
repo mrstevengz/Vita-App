@@ -37,7 +37,8 @@ import com.example.vita_app.ui.theme.PineBlue
 
 @Composable
 fun HomeScreen(
-    onCalorieCardClick: () -> Unit
+    onCalorieCardClick: () -> Unit,
+    onWorkoutCardClick: () -> Unit
 ) {
     //Contenido principal de la APP
     AppBackground {
@@ -183,7 +184,8 @@ fun HomeScreen(
                             Card(
                                 modifier = Modifier.weight(1f).height(160.dp),
                                 shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(6.dp)
+                                elevation = CardDefaults.cardElevation(6.dp),
+                                onClick = onWorkoutCardClick
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
 
