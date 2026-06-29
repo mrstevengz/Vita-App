@@ -12,25 +12,25 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface WorkoutEntriesApi {
-    @GET("workout-entries")
+    @GET("workouts-entries")
     suspend fun getEntries(
         @Header("Authorization") token: String
     ): List<WorkoutEntryResponse>
 
-    @POST("workout-entries")
+    @POST("workouts-entries")
     suspend fun createEntry(
         @Body body: WorkoutEntryRequest,
         @Header("Authorization") token: String
     ): WorkoutEntryResponse
 
-    @PUT("workout-entries/{id}")
+    @PUT("workouts-entries/{id}")
     suspend fun updateEntry(
         @Path("id") id: Int,
         @Body body: WorkoutEntryRequest,
         @Header("Authorization") token: String
     ): WorkoutEntryResponse
 
-    @DELETE("workout-entries/{id}")
+    @DELETE("workouts-entries/{id}")
     suspend fun deleteEntry(
         @Path("id") id: Int,
         @Header("Authorization") token: String

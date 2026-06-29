@@ -24,6 +24,15 @@ class MealsViewModel: ViewModel() {
     private val _events = Channel<String>()
     val events = _events.receiveAsFlow()
 
+    //Suma de las calorias de TODAS las meals entries
+    val foodCalories: Int
+        get() = entries.sumOf {entry ->
+        val calPer100 = entry.meal.calories.toDoubleOrNull() ?: 0.0
+        val grams = entry.grams.toDoubleOrNull() ?: 0.0
+        calPer100 * grams / 100.0
+    }.toInt()
+
+
     //Cuando se inicializa la clase, siempre va a cargar la lista de Meals del API
     init {
         loadMeals()

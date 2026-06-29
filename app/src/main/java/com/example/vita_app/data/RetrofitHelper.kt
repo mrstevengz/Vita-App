@@ -3,7 +3,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitHelper {
-    private val baseUrl = "http://10.0.2.2:5000/api/" //Hardcoded por ahora, tiene que ser una variable env
+    private val baseUrl = "https://vita-app-api.onrender.com/api/" //Hardcoded por ahora, tiene que ser una variable env
 
     private var instance: Retrofit? = null
 

@@ -29,18 +29,23 @@ import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.ui.components.AppBackground
 import com.example.vita_app.ui.components.HomeTopBar
 import com.example.vita_app.ui.components.MealSection
+import com.example.vita_app.ui.components.WorkoutSection
 import com.example.vita_app.ui.screen.meals.MealsViewModel
+import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 import com.example.vita_app.ui.theme.CarbonBlack
 
 
 @Composable
 fun DiaryScreen(
     viewModel: MealsViewModel, //Se manda a llamar el viewmodel de Meals para obtener los metodos
+    workoutsViewModel: WorkoutViewModel,
     onAddMealClick: () -> Unit,
-    onMealEditClick: (Int) -> Unit
+    onMealEditClick: (Int) -> Unit,
+    onAddWorkoutClick: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         viewModel.loadEntries()
+        workoutsViewModel.loadEntries()
     }
 
     val entries =
@@ -49,6 +54,14 @@ fun DiaryScreen(
     //Uso equivalente a filter en JS, se pasa en el lambda la seccion y meal como (it)
     //Se guarda el resultado (un mapa) en la variable grouped
     val grouped = entries.groupBy { it.section }
+
+    //Hardcoded goal
+    val goal = 2000
+    val foodCalories = viewModel.foodCalories
+    val exerciseCalories = workoutsViewModel.exerciseCalories
+
+    //Remaining cals
+    val remaining = goal - foodCalories + exerciseCalories
 
     AppBackground { // Fondo personalizado de la app
         LazyColumn(
@@ -91,7 +104,7 @@ fun DiaryScreen(
 
                             // GOAL
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("1300", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                                Text("$goal", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                                 Text("Goal", fontSize = 12.sp, color = Color.Gray)
                             }
 
@@ -99,7 +112,7 @@ fun DiaryScreen(
 
                             // FOOD
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("259", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                                Text("$foodCalories", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                                 Text("Food", fontSize = 12.sp, color = Color.Gray)
                             }
 
@@ -107,7 +120,7 @@ fun DiaryScreen(
 
                             // EXERCISE
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("3", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                                Text("$exerciseCalories", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                                 Text("Exercise", fontSize = 12.sp, color = Color.Gray)
                             }
 
@@ -116,7 +129,7 @@ fun DiaryScreen(
                             // RESULTADO
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    "1044",
+                                    "${remaining.toInt()}",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
                                     color = Color(0xFF1FA3A3)
@@ -142,6 +155,13 @@ fun DiaryScreen(
                     onAddClick = onAddMealClick,
                     onEntryDelete = {entry -> viewModel.deleteEntry(entry.id)},
                     onEntryClick = {entry -> onMealEditClick(entry.id)}
+                )
+            }
+            item{
+                WorkoutSection(
+                    entries = workoutsViewModel.entries,
+                    onAddClick = onAddWorkoutClick,
+                    onEntryDelete = {entry -> workoutsViewModel.deleteEntry(entry.id)}
                 )
             }
 

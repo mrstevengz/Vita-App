@@ -30,9 +30,10 @@ import com.example.vita_app.ui.screen.login.AuthEvent
 import com.example.vita_app.ui.screen.login.AuthViewModel
 import com.example.vita_app.ui.screen.login.RegisterScreen
 import com.example.vita_app.ui.screen.meals.MealsViewModel
+import com.example.vita_app.ui.screen.workouts.AddWorkoutScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutCatalogScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
-import java.util.Map.entry
+
 
 
 @SuppressLint("RestrictedApi")
@@ -69,6 +70,9 @@ fun AppNavigation() {
 
     LaunchedEffect(Unit) {
         mealsViewModel.events.collect { message -> snackbarHostState.showSnackbar(message) }
+    }
+    LaunchedEffect(Unit) {
+        workoutsViewModel.events.collect {message -> snackbarHostState.showSnackbar(message)}
     }
 
     Scaffold(
@@ -139,15 +143,19 @@ fun AppNavigation() {
             composable<Home> {
                 HomeScreen(
                     onCalorieCardClick = {navController.navigate(Diary(""))},
-                    onWorkoutCardClick = {navController.navigate(WorkoutCatalog)}
+                    onWorkoutCardClick = {navController.navigate(WorkoutCatalog)},
+                    mealsViewModel = mealsViewModel,
+                    workoutViewModel = workoutsViewModel
                 )
             }
 
             composable<Diary> {
                 DiaryScreen(
                     viewModel = mealsViewModel,
+                    workoutsViewModel = workoutsViewModel,
                     onAddMealClick = {navController.navigate(Catalog)},
-                    onMealEditClick = {id -> navController.navigate(EditMeal(id))}
+                    onMealEditClick = {id -> navController.navigate(EditMeal(id))},
+                    onAddWorkoutClick = {navController.navigate(WorkoutCatalog)}
                 )
             }
 
@@ -194,7 +202,21 @@ fun AppNavigation() {
                 WorkoutCatalogScreen(
                     viewModel = workoutsViewModel,
                     onWorkoutClick = {
-                        TODO()
+                        id -> navController.navigate(AddWorkout(id))
+                    },
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable<AddWorkout> { entry ->
+                val args = entry.toRoute<AddWorkout>()
+                AddWorkoutScreen(
+                    viewModel = workoutsViewModel,
+                    workoutId = args.workoutId,
+                    onAdd = {
+                        navController.popBackStack(WorkoutCatalog, inclusive = true)
                     },
                     onBack = {
                         navController.popBackStack()

@@ -22,6 +22,19 @@ class WorkoutViewModel: ViewModel() {
     private val _events = Channel<String>()
     val events = _events.receiveAsFlow()
 
+    val exerciseCalories: Int
+        get() = entries.sumOf { entry ->
+        val perHour = entry.workout.caloriesPerHour.toDoubleOrNull() ?: 0.0
+        val minutes = entry.minutes.toDoubleOrNull() ?: 0.0
+        perHour * minutes / 60.0
+    }.toInt()
+
+    val exerciseTime: Int
+        get() = entries.sumOf { entry ->
+            val totalMinutes = entry.minutes.toDoubleOrNull() ?: 0.0
+            totalMinutes
+        }.toInt()
+
     init {
         loadWorkouts()
     }
