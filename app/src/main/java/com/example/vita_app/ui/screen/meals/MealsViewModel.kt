@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.meals
 
+// Proposito: ViewModel de comidas. Mantiene catalogo, diario y operaciones CRUD de entradas.
+
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
+// Mantiene el estado de comidas y diario para que Compose reaccione automaticamente.
 class MealsViewModel: ViewModel() {
     //Se inicializa una instancia del repositorio del api, y un array de Meal's para guardarlo en
     // las pantallas y mostrarlo
@@ -30,6 +33,7 @@ class MealsViewModel: ViewModel() {
     }
 
     //Funcion para cargar los meals existentes.
+    // Carga el catalogo de comidas desde la API y actualiza la lista observable.
     fun loadMeals() {
         viewModelScope.launch {
             //Try Catch para excepciones al cargar
@@ -45,6 +49,7 @@ class MealsViewModel: ViewModel() {
             }
         }
     }
+    // Carga las comidas registradas por el usuario autenticado.
     fun loadEntries() {
         viewModelScope.launch {
             try {
@@ -59,6 +64,7 @@ class MealsViewModel: ViewModel() {
 
     // -- Acciones del diario ------------------
 
+    // Registra una comida seleccionada en una seccion del dia.
     fun addEntry(mealId: Int, grams: String, section: MealType) {
         viewModelScope.launch {
             try {
@@ -80,6 +86,7 @@ class MealsViewModel: ViewModel() {
         }
     }
 
+    // Elimina una entrada del diario y refresca el estado local.
     fun deleteEntry(id : Int) {
         //Se manda a llamar el metodo de deleteMeal del repositorio, se le pasa el ID y borra todos los meals que
         // coincidan con el ID (solo puede ser 1 al ser unico). Esto se hace con el fin de agilizar la actualizacion del
@@ -98,6 +105,7 @@ class MealsViewModel: ViewModel() {
         }
     }
 
+    // Actualiza gramos o seccion de una comida registrada.
     fun updateEntry(id:Int, grams: String, section: MealType) {
         viewModelScope.launch {
             try {

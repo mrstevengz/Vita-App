@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.components
 
+// Proposito: Componente superior de Home con saludo y acceso visual al perfil.
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +24,7 @@ import com.example.vita_app.R
 import com.example.vita_app.ui.theme.CarbonBlack
 
 @Composable
+// Barra superior reutilizable que saluda al usuario.
 fun HomeTopBar(nombre: String) {
 
     Row(

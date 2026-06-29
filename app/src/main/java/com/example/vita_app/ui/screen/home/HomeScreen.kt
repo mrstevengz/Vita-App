@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.home
 
+// Proposito: Pantalla principal despues del login. Resume accesos a diario y ejercicios.
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +38,7 @@ import com.example.vita_app.ui.components.HomeTopBar
 import com.example.vita_app.ui.theme.PineBlue
 
 @Composable
+// Pantalla de resumen que funciona como menu principal despues de autenticarse.
 fun HomeScreen(
     onCalorieCardClick: () -> Unit,
     onWorkoutCardClick: () -> Unit

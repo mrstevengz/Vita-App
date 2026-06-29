@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.editmeal
 
+// Proposito: Pantalla para modificar o eliminar una entrada de comida ya registrada.
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -49,6 +51,7 @@ import com.example.vita_app.ui.screen.meals.MealsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+// Permite modificar o borrar una comida que ya estaba registrada en el diario.
 fun EditMealScreen(
     vm: MealsViewModel,
     entryId: Int,
@@ -69,6 +72,7 @@ fun EditMealScreen(
     var section by remember {mutableStateOf(entry.section)}
 
     //Variable sencilla para almacenar y mandar a llamar el update, se le tienen que pasar todos los datos
+    // Accion de guardado: valida los campos y delega la actualizacion al ViewModel.
     val saveMeal = {
         //Llamada a la funcion, le pasa el id y la variable con el meal
         vm.updateEntry(entryId, grams, section)

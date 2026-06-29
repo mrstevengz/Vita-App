@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.components
 
+// Proposito: Componente reutilizable que aplica el fondo visual comun de la aplicacion.
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +17,7 @@ import com.example.vita_app.ui.theme.MutedOlive
 import com.example.vita_app.ui.theme.PineBlue
 
 @Composable
+// Envuelve pantallas con un fondo consistente y recibe contenido como slot.
 fun AppBackground(content: @Composable () -> Unit) {
 
     Box(

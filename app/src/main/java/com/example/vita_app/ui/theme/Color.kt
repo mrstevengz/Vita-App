@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.theme
 
+// Proposito: Paleta de colores usada por el tema visual de VitaApp.
+
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)

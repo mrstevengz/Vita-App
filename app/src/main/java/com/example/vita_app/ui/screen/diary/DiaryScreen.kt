@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.diary
 
+// Proposito: Pantalla del diario. Agrupa entradas por seccion y muestra comidas registradas.
+
 import android.annotation.SuppressLint
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +36,7 @@ import com.example.vita_app.ui.theme.CarbonBlack
 
 
 @Composable
+// Muestra el diario del usuario agrupado por desayuno, almuerzo, cena y snacks.
 fun DiaryScreen(
     viewModel: MealsViewModel, //Se manda a llamar el viewmodel de Meals para obtener los metodos
     onAddMealClick: () -> Unit,
@@ -48,6 +51,7 @@ fun DiaryScreen(
 
     //Uso equivalente a filter en JS, se pasa en el lambda la seccion y meal como (it)
     //Se guarda el resultado (un mapa) en la variable grouped
+    // Agrupa las entradas por seccion para renderizar cada bloque del dia.
     val grouped = entries.groupBy { it.section }
 
     AppBackground { // Fondo personalizado de la app

@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.navigation
 
+// Proposito: Coordina la navegacion, los ViewModels compartidos, la BottomBar y los mensajes Snackbar.
+
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
@@ -37,6 +39,7 @@ import java.util.Map.entry
 
 @SuppressLint("RestrictedApi")
 @Composable
+// Composable central donde se definen pantallas y acciones de navegacion.
 fun AppNavigation() {
     //INICIALIZAR NAV CONTROLLER
     val navController = rememberNavController()
@@ -49,9 +52,10 @@ fun AppNavigation() {
     //Llama el navBackStackEntry y dice exactamente el composable en el que esta, no muestra otros argumentos
     val currentDestination = navBackStackEntry?.destination
 
-    //Remember hace que calcule una vez  el destination, algo parecido a useMemo(),
+    //Remember hace que calcule una vez  el destination,
     // hierarchy chequea todas las rutas existentes, si el destination
     //esta en la ruta Home o Diary, que actualize la variable a true, y asi se muestra el bottombar
+    // Calcula si la BottomBar debe mostrarse segun la pantalla actual.
     val showBottomBar = remember(currentDestination) {
         currentDestination?.hierarchy?.any {
             it.hasRoute(Home::class) || it.hasRoute(Diary::class)
@@ -59,7 +63,9 @@ fun AppNavigation() {
     }
 
     //Se inicializa un viewmodel meals.
+    // ViewModel compartido por pantallas relacionadas con comidas y diario.
     val mealsViewModel: MealsViewModel = viewModel()
+    // ViewModel compartido por pantallas relacionadas con ejercicios.
     val workoutsViewModel: WorkoutViewModel = viewModel()
 
 
@@ -67,6 +73,7 @@ fun AppNavigation() {
         SnackbarHostState()
     }
 
+    // Escucha eventos del ViewModel para mostrar mensajes sin acoplarlos a una pantalla concreta.
     LaunchedEffect(Unit) {
         mealsViewModel.events.collect { message -> snackbarHostState.showSnackbar(message) }
     }
@@ -121,6 +128,7 @@ fun AppNavigation() {
             composable<Login> {
                 val authViewModel: AuthViewModel = viewModel()
 
+                // Escucha eventos del AuthViewModel para navegar al Home o mostrar errores.
                 LaunchedEffect(Unit) {
                     authViewModel.events.collect { event ->
                         when(event) {

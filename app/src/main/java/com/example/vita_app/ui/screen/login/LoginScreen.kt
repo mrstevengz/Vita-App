@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.login
 
+// Proposito: Pantalla donde el usuario ingresa credenciales para obtener un token de sesion.
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +31,7 @@ import com.example.vita_app.ui.theme.PastelCyan
 import com.example.vita_app.ui.theme.White
 
 @Composable
+// Formulario de login; delega la validacion de credenciales al AuthViewModel.
 fun LoginScreen(viewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

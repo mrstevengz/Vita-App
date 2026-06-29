@@ -1,5 +1,7 @@
 package com.example.vita_app.data.remote.api
 
+// Proposito: Define las llamadas HTTP para leer y modificar los ejercicios registrados por el usuario.
+
 import com.example.vita_app.data.remote.model.WorkoutEntryRequest
 import com.example.vita_app.data.remote.model.WorkoutEntryResponse
 import retrofit2.Response
@@ -11,6 +13,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
+// Interfaz Retrofit para registrar, editar o borrar ejercicios hechos por el usuario.
 interface WorkoutEntriesApi {
     @GET("workout-entries")
     suspend fun getEntries(

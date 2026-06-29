@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.login
 
+// Proposito: Pantalla inicial que dirige al usuario hacia login o registro.
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +31,7 @@ import com.example.vita_app.ui.theme.PineBlue
 import com.example.vita_app.ui.theme.White
 
 @Composable
+// Primera pantalla visible; ofrece entrada a login o registro.
 fun WelcomeScreen(
     onNavigateToLogin: () -> Unit, // Acción cuando presiona "Iniciar sesión" o "Registrar"
     onRegisterClick: () -> Unit

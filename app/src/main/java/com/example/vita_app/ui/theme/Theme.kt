@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.theme
 
+// Proposito: Configuracion de MaterialTheme para colores, tipografia y modo claro/oscuro.
+
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -33,6 +35,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
+// Aplica el tema Material 3 de la app a todo el arbol de composables.
 fun VitaAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+

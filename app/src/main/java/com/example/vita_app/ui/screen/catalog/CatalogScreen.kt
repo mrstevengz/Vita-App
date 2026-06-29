@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.catalog
 
+// Proposito: Pantalla de catalogo de comidas. Permite buscar y elegir una comida para agregarla al diario.
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+// Muestra todas las comidas disponibles y permite filtrarlas por texto.
 fun CatalogScreen(
     viewModel: MealsViewModel,
     onMealClick: (Int) -> Unit,
@@ -53,6 +56,7 @@ fun CatalogScreen(
 
     var query by remember { mutableStateOf("") }
 
+    // Filtra en memoria para que la busqueda responda de inmediato mientras se escribe.
     val filtered = catalog.filter { it.name.contains(query, ignoreCase = true) }
 
     AppBackground {

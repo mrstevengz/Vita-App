@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.login
 
+// Proposito: Pantalla de registro de usuario con campos de entrada y validacion visual basica.
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,6 +57,7 @@ import com.example.vita_app.ui.theme.SoftTurqoise
 import com.example.vita_app.ui.theme.White
 
 @Composable
+// Formulario de registro; captura los datos necesarios para crear una cuenta.
 fun RegisterScreen(
     onRegisterSuccess: (String) -> Unit,
     onNavigateToLogin: () -> Unit

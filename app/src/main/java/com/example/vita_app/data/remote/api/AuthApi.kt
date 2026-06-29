@@ -1,5 +1,7 @@
 package com.example.vita_app.data.remote.api
 
+// Proposito: Define las rutas de autenticacion de la API: login y registro.
+
 import com.example.vita_app.data.remote.model.LoginRequest
 import com.example.vita_app.data.remote.model.RegisterRequest
 import com.example.vita_app.data.remote.model.TokenResponse
@@ -7,6 +9,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
+// Retrofit convierte estas funciones en peticiones HTTP reales contra /auth.
 interface AuthApi {
 
     @POST("auth/login")

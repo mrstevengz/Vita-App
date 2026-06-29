@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.addmeal
 
+// Proposito: Pantalla para registrar una comida seleccionada indicando gramos y seccion del dia.
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -41,8 +43,10 @@ import com.example.vita_app.ui.screen.meals.MealsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+// Recibe el id de una comida del catalogo y permite registrar gramos y seccion.
 fun AddMeal(viewModel: MealsViewModel, mealId: Int, onMealAdd: () -> Unit, onBack: () -> Unit) {
 
+    // Busca la comida seleccionada dentro del catalogo ya cargado en el ViewModel.
     val meal = viewModel.meals.find {it.id == mealId}
     if (meal == null){
         Text("Meal not found")

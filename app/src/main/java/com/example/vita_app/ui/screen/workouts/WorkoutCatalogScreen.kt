@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.workouts
 
+// Proposito: Pantalla de catalogo de ejercicios. Permite buscar y seleccionar workouts disponibles.
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,6 +41,7 @@ import com.example.vita_app.ui.navigation.WorkoutCatalog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+// Muestra todos los workouts disponibles y permite buscarlos por nombre.
 fun WorkoutCatalogScreen(
     viewModel: WorkoutViewModel,
     onWorkoutClick: (Int) -> Unit,
@@ -48,6 +51,7 @@ fun WorkoutCatalogScreen(
 
     var query by remember { mutableStateOf("") }
 
+    // Filtra workouts localmente para actualizar la lista al escribir.
     val filtered = catalog.filter { it.name.contains(query, ignoreCase = true) }
 
     AppBackground {

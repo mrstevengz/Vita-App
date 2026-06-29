@@ -1,5 +1,7 @@
 package com.example.vita_app.data.remote.api
 
+// Proposito: Define las llamadas HTTP para leer y modificar las comidas registradas en el diario del usuario.
+
 import com.example.vita_app.data.remote.model.DiaryEntryRequest
 import com.example.vita_app.data.remote.model.DiaryEntryResponse
 import retrofit2.Response
@@ -11,6 +13,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
+// Interfaz Retrofit para endpoints que requieren Authorization Bearer token.
 interface EntriesApi {
     @GET("entries")
     suspend fun getEntries(

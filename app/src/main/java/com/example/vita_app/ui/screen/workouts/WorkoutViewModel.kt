@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.screen.workouts
 
+// Proposito: ViewModel de ejercicios. Mantiene catalogo, registros y operaciones sobre workout entries.
+
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +14,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
+// Mantiene el estado de workouts y registros para la parte de ejercicio.
 class WorkoutViewModel: ViewModel() {
     private val workoutRepo = WorkoutRepo()
     private val entryRepo = WorkoutEntryRepo()
@@ -26,6 +29,7 @@ class WorkoutViewModel: ViewModel() {
         loadWorkouts()
     }
 
+    // Carga el catalogo de ejercicios desde la API.
     fun loadWorkouts() {
         viewModelScope.launch {
             try {
@@ -38,6 +42,7 @@ class WorkoutViewModel: ViewModel() {
         }
     }
 
+    // Carga los ejercicios registrados por el usuario autenticado.
     fun loadEntries() {
         viewModelScope.launch {
             try {
@@ -51,6 +56,7 @@ class WorkoutViewModel: ViewModel() {
         }
     }
 
+    // Registra minutos realizados para un workout seleccionado.
     fun addEntry(workoutId: Int, minutes: String) {
         viewModelScope.launch {
             try {
@@ -64,6 +70,7 @@ class WorkoutViewModel: ViewModel() {
         }
     }
 
+    // Elimina un registro de ejercicio y actualiza la lista.
     fun deleteEntry(id: Int) {
         viewModelScope.launch {
             try {
@@ -77,6 +84,7 @@ class WorkoutViewModel: ViewModel() {
         }
     }
 
+    // Actualiza los minutos de un registro de ejercicio existente.
     fun updateEntry(id: Int, minutes: String) {
         viewModelScope.launch {
             try {

@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.components
 
+// Proposito: Componentes visuales para agrupar y mostrar comidas del diario, incluyendo swipe para borrar.
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +38,7 @@ import com.example.vita_app.ui.theme.CarbonBlack
 
 
 @Composable
+// Renderiza una seccion del diario y sus comidas registradas.
 fun MealSection(
     /*La seccion de meal tiene como parametros su seccion especifica, la lista de meals que empiezan vacias,
     * y una funcion para cuando se cliquee (abre addmeal) y cuando se desea borrar por medio de un swipe*/
@@ -86,6 +89,7 @@ fun MealSection(
 @Composable
 private fun EntryRow(entry: DiaryEntryResponse, onDelete: (DiaryEntryResponse) -> Unit, onClick: (DiaryEntryResponse) -> Unit) {
     //Se crea un SwipeToDismissBoxState Object
+    // Estado que controla el gesto de swipe para detectar eliminacion.
     val dismissState = rememberSwipeToDismissBoxState()
 
     //Si cambia el valor del dismiss state, se confirma que haya terminado (end to start) y se mand a allamar la funcion
@@ -101,6 +105,7 @@ private fun EntryRow(entry: DiaryEntryResponse, onDelete: (DiaryEntryResponse) -
     //Gramos del meal
     val grams = entry.grams.toDoubleOrNull() ?: 0.0
     //Calorias totales = calorias * gramos / 100
+    // Calcula calorias reales segun los gramos registrados por el usuario.
     val totalCal = (per100 * grams / 100.0).toInt()
 
     //En el objeto se le asigna un estado (dismiss state), se desactiva la opcion para hacer swipe de derecha a izquierda,

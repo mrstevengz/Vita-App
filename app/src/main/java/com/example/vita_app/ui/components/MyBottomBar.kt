@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.components
 
+// Proposito: Barra inferior de navegacion para moverse entre Home y Diary.
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Dashboard
@@ -18,6 +20,7 @@ import com.example.vita_app.ui.navigation.Diary
 import com.example.vita_app.ui.navigation.Home
 
 @Composable
+// Barra de navegacion inferior conectada al NavController principal.
 fun BottomBar(navController: NavController) {
     //Se vuelven a llamar las mismas variables del AppNavigation, para saber en que pantalla se esta
     val navBackStackEntry by navController.currentBackStackEntryAsState()

@@ -1,5 +1,7 @@
 package com.example.vita_app.ui.components
 
+// Proposito: Componente que calcula una vista previa de macros segun la cantidad de gramos ingresada.
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +18,13 @@ import com.example.vita_app.data.remote.model.MealResponse
 import kotlin.text.toInt
 
 @Composable
+// Calcula y muestra macros proporcionales a los gramos ingresados.
 fun MacroPreview(
     meal: MealResponse,
     grams: String,
     modifier: Modifier = Modifier
 ) {
+    // Convierte gramos a proporcion sobre 100g, porque la API guarda macros por 100g.
     val factor = (grams.toDoubleOrNull() ?: 0.0)/ 100.0
     val calsToAdd = (meal.calories.toDoubleOrNull() ?: 0.0) * factor
     val proteinToAdd = (meal.protein.toDoubleOrNull() ?: 0.0) * factor
