@@ -95,6 +95,8 @@ class WorkoutViewModel: ViewModel() {
             try {
                 val current = entries.find {it.id == id} ?: return@launch
                 entryRepo.updateWorkoutEntry(id, WorkoutEntryRequest(current.workoutId, minutes))
+                loadEntries()
+                _events.send("Workout updated")
             }catch (e: Exception) {
                 println("Fallo al editar workout: ${e.message}")
                 _events.send("Error updating the workout")

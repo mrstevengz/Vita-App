@@ -14,3 +14,7 @@ data class RegisterRequest(
 data class TokenResponse(
     @SerializedName("token") val token: String
 )
+
+data class ApiError(
+    @SerializedName("error") val error: String?
+)

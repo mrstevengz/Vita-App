@@ -41,7 +41,8 @@ fun DiaryScreen(
     workoutsViewModel: WorkoutViewModel,
     onAddMealClick: () -> Unit,
     onMealEditClick: (Int) -> Unit,
-    onAddWorkoutClick: () -> Unit
+    onAddWorkoutClick: () -> Unit,
+    onWorkoutEditClick: (Int) -> Unit
 ) {
     LaunchedEffect(Unit) {
         viewModel.loadEntries()
@@ -161,7 +162,8 @@ fun DiaryScreen(
                 WorkoutSection(
                     entries = workoutsViewModel.entries,
                     onAddClick = onAddWorkoutClick,
-                    onEntryDelete = {entry -> workoutsViewModel.deleteEntry(entry.id)}
+                    onEntryDelete = {entry -> workoutsViewModel.deleteEntry(entry.id)},
+                    onEntryClick = {entry -> onWorkoutEditClick(entry.id)}
                 )
             }
 

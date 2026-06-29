@@ -31,6 +31,7 @@ import com.example.vita_app.ui.screen.login.AuthViewModel
 import com.example.vita_app.ui.screen.login.RegisterScreen
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 import com.example.vita_app.ui.screen.workouts.AddWorkoutScreen
+import com.example.vita_app.ui.screen.workouts.EditWorkoutScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutCatalogScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 
@@ -102,24 +103,32 @@ fun AppNavigation() {
 
             //Pantalla de Registro
 
-            composable<Register> {
-                RegisterScreen(
-                    onRegisterSuccess = { name ->
-                        navController.navigate(Home(name = name)) {
-                            popUpTo(Welcome) {
-                                inclusive = true
+           composable<Register> {
+               val authViewModel: AuthViewModel = viewModel()
+
+               LaunchedEffect(Unit) {
+                   authViewModel.events.collect {
+                       event -> when (event) {
+                           is AuthEvent.RegisterSuccess ->
+                               navController.navigate(Login) {
+                                   popUpTo(Register) { inclusive = true}
+                               }
+                            is AuthEvent.ShowError -> {
+                                snackbarHostState.showSnackbar(event.message)
                             }
-                        }
-                    },
-                    onNavigateToLogin = {
-                        navController.navigate(Login) {
-                            popUpTo(Register) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                )
-            }
+                            is AuthEvent.Success -> {}
+                       }
+                   }
+               }
+               RegisterScreen(
+                   viewModel = authViewModel,
+                   onNavigateToLogin = {
+                       navController.navigate(Login) {
+                           popUpTo(Register) {inclusive = true}
+                       }
+                   }
+               )
+           }
             //Pantalla de Login
 
             composable<Login> {
@@ -133,6 +142,7 @@ fun AppNavigation() {
                                     popUpTo(Welcome) {inclusive = true}
                                 }
                             is AuthEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+                            is AuthEvent.RegisterSuccess -> {}
                         }
                     }
                 }
@@ -155,7 +165,8 @@ fun AppNavigation() {
                     workoutsViewModel = workoutsViewModel,
                     onAddMealClick = {navController.navigate(Catalog)},
                     onMealEditClick = {id -> navController.navigate(EditMeal(id))},
-                    onAddWorkoutClick = {navController.navigate(WorkoutCatalog)}
+                    onAddWorkoutClick = {navController.navigate(WorkoutCatalog)},
+                    onWorkoutEditClick = {id -> navController.navigate(EditWorkout(id))}
                 )
             }
 
@@ -221,6 +232,17 @@ fun AppNavigation() {
                     onBack = {
                         navController.popBackStack()
                     }
+                )
+            }
+
+            composable<EditWorkout> {entry ->
+                val args = entry.toRoute<EditWorkout>()
+
+                EditWorkoutScreen(
+                    viewmodel = workoutsViewModel,
+                    entryId = args.entryId,
+                    onCompleted = {navController.popBackStack()},
+                    onBack = {navController.popBackStack()}
                 )
             }
         }

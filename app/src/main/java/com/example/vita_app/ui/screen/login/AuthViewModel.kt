@@ -16,6 +16,7 @@ sealed class AuthEvent {
     data class Success(val name: String): AuthEvent()
 
     data class ShowError(val message: String) : AuthEvent()
+    object RegisterSuccess : AuthEvent()
 }
 
 class AuthViewModel : ViewModel() {
@@ -40,6 +41,17 @@ class AuthViewModel : ViewModel() {
                 is AuthResult.Error -> _events.send(AuthEvent.ShowError(result.message))
             }
 
+            isLoading = false
+        }
+    }
+
+    fun register(email: String, password: String) {
+        viewModelScope.launch {
+            isLoading = true
+            when (val result = repo.registerUser(email, password)) {
+                is AuthResult.Success -> _events.send(AuthEvent.RegisterSuccess)
+                is AuthResult.Error -> _events.send(AuthEvent.ShowError(result.message))
+            }
             isLoading = false
         }
     }

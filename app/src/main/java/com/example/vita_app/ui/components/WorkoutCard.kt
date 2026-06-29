@@ -40,6 +40,7 @@ fun WorkoutSection(
     entries: List<WorkoutEntryResponse> = emptyList(),
     onAddClick: () -> Unit = {},
     onEntryDelete: (WorkoutEntryResponse) -> Unit = {},
+    onEntryClick: (WorkoutEntryResponse) -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         Text("Exercise", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = CarbonBlack)
@@ -55,7 +56,7 @@ fun WorkoutSection(
             Column {
                 entries.forEach { entry ->
                     key(entry.id) {
-                        WorkoutEntryRow(entry = entry, onDelete = onEntryDelete)
+                        WorkoutEntryRow(entry = entry, onDelete = onEntryDelete, onClick = onEntryClick)
                     }
                 }
             }
@@ -78,7 +79,11 @@ fun WorkoutSection(
 
 //Se crea un private row donde se le otorga un swipe, un lambda para pasar un ejercicio y realizar una accion (delete) y el UI
 @Composable
-private fun WorkoutEntryRow(entry: WorkoutEntryResponse, onDelete: (WorkoutEntryResponse) -> Unit) {
+private fun WorkoutEntryRow(
+    entry: WorkoutEntryResponse,
+    onDelete: (WorkoutEntryResponse) -> Unit,
+    onClick: (WorkoutEntryResponse) -> Unit
+) {
     //Se crea un SwipeToDismissBoxState Object
     val dismissState = rememberSwipeToDismissBoxState()
 
@@ -113,7 +118,8 @@ private fun WorkoutEntryRow(entry: WorkoutEntryResponse, onDelete: (WorkoutEntry
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(vertical = 12.dp, horizontal = 8.dp),
+                .padding(vertical = 12.dp, horizontal = 8.dp)
+                .clickable {onClick(entry)},
 
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically

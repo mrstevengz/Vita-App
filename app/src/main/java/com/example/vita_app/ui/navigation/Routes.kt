@@ -31,3 +31,5 @@ data class EditMeal(val mealId: Int)
 object WorkoutCatalog
 @Serializable
 data class AddWorkout(val workoutId: Int)
+@Serializable
+data class EditWorkout(val entryId: Int)

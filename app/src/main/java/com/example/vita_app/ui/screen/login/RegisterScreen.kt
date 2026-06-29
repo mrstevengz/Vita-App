@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -56,8 +57,8 @@ import com.example.vita_app.ui.theme.White
 
 @Composable
 fun RegisterScreen(
-    onRegisterSuccess: (String) -> Unit,
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    viewModel: AuthViewModel
 ) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -213,16 +214,22 @@ fun RegisterScreen(
                             )
 
                             if (errorMessage == null) {
-                                onRegisterSuccess(firstName.trim())
+                                viewModel.register(email, password)
                             }
                         },
+                        enabled = !viewModel.isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
                         shape = RoundedCornerShape(30.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = PineBlue)
                     ) {
-                        Text("Registrarse", color = White)
+                        if(viewModel.isLoading) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = White,
+                                strokeWidth = 2.dp)
+                        } else {
+                            Text("Registrarse", color = White)
+                        }
                     }
 
                     Row(
