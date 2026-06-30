@@ -21,6 +21,7 @@ fun AppBackground(content: @Composable () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundLight)
+            .padding(top = 10.dp)
     ) {
 
         // Mancha 1

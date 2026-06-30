@@ -1,6 +1,5 @@
 package com.example.vita_app.ui.screen.home
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +20,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,21 +35,54 @@ import androidx.navigation.NavHostController
 import com.example.vita_app.ui.components.AppBackground
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.components.HomeTopBar
+import com.example.vita_app.ui.screen.meals.MealsViewModel
+import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 import com.example.vita_app.ui.theme.PineBlue
+import kotlin.time.ExperimentalTime
 
 @Composable
-fun HomeScreen(name: String, navController: NavHostController) {
-    Scaffold(
-        bottomBar = { BottomBar(navController, name) }
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            AppBackground {
-                //Contenido principal de la APP
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(top = 10.dp)
-                ) {
+fun HomeScreen(
+    onCalorieCardClick: () -> Unit,
+    onWorkoutCardClick: () -> Unit,
+    mealsViewModel: MealsViewModel,
+    workoutViewModel: WorkoutViewModel,
+    onLogout: () -> Unit
+) {
 
-                    HomeTopBar(name) //
+    //Variables para llenar contenido
+
+    LaunchedEffect(Unit) {
+        mealsViewModel.loadEntries()
+        workoutViewModel.loadEntries()
+    }
+    val goal = 2000
+    val foodCalories = mealsViewModel.foodCalories
+    val exerciseCalories = workoutViewModel.exerciseCalories
+    val exerciseTime = workoutViewModel.exerciseTime
+
+    //Remaining cals
+    val remaining = goal - foodCalories + exerciseCalories
+
+    fun formatMinutes(exerciseTime: Int): String {
+        val hours = exerciseTime / 60
+        val minutes = exerciseTime % 60
+
+        return "$hours:${"%02d".format(minutes)}"
+    }
+    //Contenido principal de la APP
+    AppBackground {
+
+        Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp))
+        {
+
+            HomeTopBar("Yo") //
+
+            TextButton(
+                onClick = onLogout,
+                modifier = Modifier.align(Alignment.End).padding(end = 16.dp)
+            ) {
+                Text("Cerrar sesion", color = PineBlue)
+            }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -64,7 +98,8 @@ fun HomeScreen(name: String, navController: NavHostController) {
                         Card(
                             shape = RoundedCornerShape(28.dp),
                             modifier = Modifier.fillMaxWidth().height(250.dp),
-                            elevation = CardDefaults.cardElevation(4.dp)
+                            elevation = CardDefaults.cardElevation(4.dp),
+                            onClick = onCalorieCardClick
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
 
@@ -102,7 +137,7 @@ fun HomeScreen(name: String, navController: NavHostController) {
                                         }
 
                                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Text("959", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                                            Text("$remaining", fontSize = 24.sp, fontWeight = FontWeight.Bold)
                                             Text("Remaining", fontSize = 12.sp)
                                         }
                                     }
@@ -112,17 +147,17 @@ fun HomeScreen(name: String, navController: NavHostController) {
                                     Column {
 
                                         Text("Base Goal", color = Color.Gray, fontSize = 12.sp)
-                                        Text("1,600", fontWeight = FontWeight.Bold)
+                                        Text("$goal", fontWeight = FontWeight.Bold)
 
                                         Spacer(modifier = Modifier.height(8.dp))
 
                                         Text("Food", color = PineBlue, fontSize = 12.sp)
-                                        Text("641", fontWeight = FontWeight.Bold)
+                                        Text("$foodCalories", fontWeight = FontWeight.Bold)
 
                                         Spacer(modifier = Modifier.height(8.dp))
 
                                         Text("Exercise", color = Color.Gray, fontSize = 12.sp)
-                                        Text("235", fontWeight = FontWeight.Bold)
+                                        Text("$exerciseCalories", fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -184,7 +219,8 @@ fun HomeScreen(name: String, navController: NavHostController) {
                             Card(
                                 modifier = Modifier.weight(1f).height(160.dp),
                                 shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(6.dp)
+                                elevation = CardDefaults.cardElevation(6.dp),
+                                onClick = onWorkoutCardClick
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
 
@@ -198,17 +234,14 @@ fun HomeScreen(name: String, navController: NavHostController) {
 
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    Text("235 cal", fontWeight = FontWeight.Bold)
+                                    Text("$exerciseCalories cal", fontWeight = FontWeight.Bold)
 
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    Text("0:45 hr", color = Color.Gray)
+                                    Text("${formatMinutes(exerciseTime)} hr", color = Color.Gray)
                                 }
                             }
-                        }
-                    }
-                }
-            }
+                        } }
         }
     }
 }

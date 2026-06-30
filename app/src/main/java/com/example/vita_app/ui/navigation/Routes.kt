@@ -9,12 +9,30 @@ import kotlinx.serialization.Serializable
 object Welcome
 
 @Serializable
+object Register
+@Serializable
 object Login
-
 @Serializable
 data class Home(val name : String)
+
 @Serializable
 data class Diary(val name : String)
 
 @Serializable
-object AddMeal
+object Catalog
+@Serializable
+data class AddMeal(val mealId: Int)
+@Serializable
+data class EditMeal(val mealId: Int)
+
+//Workouts
+
+@Serializable
+object WorkoutCatalog
+@Serializable
+data class AddWorkout(val workoutId: Int)
+@Serializable
+data class EditWorkout(val entryId: Int)
+
+@Serializable
+object Splash

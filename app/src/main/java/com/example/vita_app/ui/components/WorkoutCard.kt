@@ -31,60 +31,59 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vita_app.data.remote.model.DiaryEntryResponse
+import com.example.vita_app.data.remote.model.WorkoutEntryResponse
 import com.example.vita_app.ui.theme.CarbonBlack
-
+import kotlin.collections.forEach
 
 @Composable
-fun MealSection(
-    /*La seccion de meal tiene como parametros su seccion especifica, la lista de meals que empiezan vacias,
-    * y una funcion para cuando se cliquee (abre addmeal) y cuando se desea borrar por medio de un swipe*/
-    section: String,
-    entries: List<DiaryEntryResponse> = emptyList(),
+fun WorkoutSection(
+    entries: List<WorkoutEntryResponse> = emptyList(),
     onAddClick: () -> Unit = {},
-    onEntryDelete: (DiaryEntryResponse) -> Unit = {},
-    onEntryClick: (DiaryEntryResponse) -> Unit = {}
+    onEntryDelete: (WorkoutEntryResponse) -> Unit = {},
+    onEntryClick: (WorkoutEntryResponse) -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(section, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = CarbonBlack)
+        Text("EXERCISE", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = CarbonBlack)
         Spacer(Modifier.height(8.dp))
 
-        //CARDS de cada seccion
 
         Card(
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(4.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            /*SE REALIZA UN CARD DENTRO DE LA COLUMNA DE SECCION, donde por cada meal adentro de una seccion, se le otorga
-            * una llave (que es su ID) y se crea un MealRow con funcionalidad de swipe */
+
             Column {
                 entries.forEach { entry ->
                     key(entry.id) {
-                        EntryRow(entry = entry, onDelete = onEntryDelete, onClick = onEntryClick)
+                        WorkoutEntryRow(entry = entry, onDelete = onEntryDelete, onClick = onEntryClick)
                     }
                 }
             }
 
             Spacer(Modifier.height(8.dp))
 
-            //Add Food Row
+            //Add Workout Row
 
             Row(
                 modifier = Modifier.fillMaxWidth().clickable {onAddClick()}.padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("ADD FOOD", color = Color(0xFF1FA3A3), fontWeight = FontWeight.Bold)
+                Text("ADD WORKOUT", color = Color(0xFF1FA3A3), fontWeight = FontWeight.Bold)
                 Text("...", fontSize = 20.sp, color = Color.Gray)
             }
         }
     }
 }
 
-//Se crea un private row donde se le otorga un swipe, un lambda para pasar un meal y realizar una accion (delete) y el UI
+//Se crea un private row donde se le otorga un swipe, un lambda para pasar un ejercicio y realizar una accion (delete) y el UI
 @Composable
-private fun EntryRow(entry: DiaryEntryResponse, onDelete: (DiaryEntryResponse) -> Unit, onClick: (DiaryEntryResponse) -> Unit) {
+private fun WorkoutEntryRow(
+    entry: WorkoutEntryResponse,
+    onDelete: (WorkoutEntryResponse) -> Unit,
+    onClick: (WorkoutEntryResponse) -> Unit
+) {
     //Se crea un SwipeToDismissBoxState Object
     val dismissState = rememberSwipeToDismissBoxState()
 
@@ -96,12 +95,9 @@ private fun EntryRow(entry: DiaryEntryResponse, onDelete: (DiaryEntryResponse) -
         }
     }
 
-    //Calorias de la entrada = calorias por 100g
-    val per100 = entry.meal.calories.toDoubleOrNull() ?: 0.0
-    //Gramos del meal
-    val grams = entry.grams.toDoubleOrNull() ?: 0.0
-    //Calorias totales = calorias * gramos / 100
-    val totalCal = (per100 * grams / 100.0).toInt()
+    val perHour = entry.workout.caloriesPerHour.toDoubleOrNull() ?: 0.0
+    val minutes = entry.minutes.toDoubleOrNull() ?: 0.0
+    val burned = (perHour * minutes / 60.0).toInt()
 
     //En el objeto se le asigna un estado (dismiss state), se desactiva la opcion para hacer swipe de derecha a izquierda,
     // y se le da un diseño. Es el que esta debajo del row y lo que se mira al hacerle swipe
@@ -117,24 +113,24 @@ private fun EntryRow(entry: DiaryEntryResponse, onDelete: (DiaryEntryResponse) -
             }
         }
     ) {
-        /*Adentro del swipe object, se realiza el row que estara por encima. En este caso el row de comida normal*/
+        /*Adentro del swipe object, se realiza el row que estara por encima. En este caso el row de ejercicio normal*/
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(vertical = 12.dp, horizontal = 8.dp)
-                .clickable{onClick(entry)},
+                .clickable {onClick(entry)},
 
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Izquierda: nombre (del catálogo) + gramos
+            // Izquierda: nombre del ejercicio + minutos
             Column {
-                Text(entry.meal.name, fontWeight = FontWeight.Medium)
-                Text("${grams.toInt()} g", fontSize = 12.sp, color = Color.Gray)
+                Text(entry.workout.name, fontWeight = FontWeight.Medium)
+                Text("${minutes.toInt()} min", fontSize = 12.sp, color = Color.Gray)
             }
-            // Derecha: calorías calculadas
-            Text("$totalCal cal", color = Color.Gray)
-        }
+            // Derecha: calorías quemadas
+            Text("$burned cal", color = Color.Gray)
         }
     }
+}

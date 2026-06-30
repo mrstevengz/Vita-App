@@ -92,15 +92,15 @@ fun WelcomeScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Button(// Botón deshabilitado (no se puede presionar)
+                    Button(
                         onClick = onRegisterClick,
-                        enabled = false,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        shape = RoundedCornerShape(24.dp)
+                        shape = RoundedCornerShape(24.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PineBlue)
                     ) {
-                        Text("Registrarse (próximamente)")
+                        Text("Registrarse", color = White)
                     }
                 }
             }

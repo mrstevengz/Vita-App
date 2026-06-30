@@ -18,26 +18,25 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = PineBlue,                    // buttons, cursors, selected chips, indicators
+    onPrimary = White,                     // text/icons on top of primary
+    secondary = CharcoalBrown,
+    onSecondary = White,
+    secondaryContainer = MutedOlive,       // selected FilterChip background (light teal)
+    onSecondaryContainer = PineBlue,       // selected FilterChip text
+    background = BackgroundLight,          // your cream page background
+    onBackground = CarbonBlack,
+    surface = White,                       // cards/boxes — pure white, visible on the cream
+    onSurface = CarbonBlack,               // text inside boxes
+    surfaceVariant = BackgroundAccent,
+    onSurfaceVariant = CharcoalBrown
 )
 
 @Composable
 fun VitaAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
