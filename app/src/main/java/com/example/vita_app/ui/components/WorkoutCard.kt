@@ -43,7 +43,7 @@ fun WorkoutSection(
     onEntryClick: (WorkoutEntryResponse) -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text("Exercise", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = CarbonBlack)
+        Text("EXERCISE", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = CarbonBlack)
         Spacer(Modifier.height(8.dp))
 
 

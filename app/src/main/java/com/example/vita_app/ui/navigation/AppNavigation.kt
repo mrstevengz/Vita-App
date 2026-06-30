@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,10 +26,10 @@ import androidx.navigation.toRoute
 import com.example.vita_app.data.TokenManager
 import com.example.vita_app.data.TokenStore
 import com.example.vita_app.ui.components.BottomBar
-import com.example.vita_app.ui.screen.addmeal.AddMeal
-import com.example.vita_app.ui.screen.catalog.CatalogScreen
+import com.example.vita_app.ui.screen.meals.AddMeal
+import com.example.vita_app.ui.screen.meals.CatalogScreen
 import com.example.vita_app.ui.screen.diary.DiaryScreen
-import com.example.vita_app.ui.screen.editmeal.EditMealScreen
+import com.example.vita_app.ui.screen.meals.EditMealScreen
 import com.example.vita_app.ui.screen.login.AuthEvent
 import com.example.vita_app.ui.screen.login.AuthViewModel
 import com.example.vita_app.ui.screen.login.LoadingScreen
@@ -38,7 +39,7 @@ import com.example.vita_app.ui.screen.workouts.AddWorkoutScreen
 import com.example.vita_app.ui.screen.workouts.EditWorkoutScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutCatalogScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
-
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("RestrictedApi")
@@ -173,11 +174,23 @@ fun AppNavigation() {
 
             //Pantalla de Home
             composable<Home> {
+                val context = LocalContext.current
+                val scope = rememberCoroutineScope()
                 HomeScreen(
                     onCalorieCardClick = {navController.navigate(Diary(""))},
                     onWorkoutCardClick = {navController.navigate(WorkoutCatalog)},
                     mealsViewModel = mealsViewModel,
-                    workoutViewModel = workoutsViewModel
+                    workoutViewModel = workoutsViewModel,
+                    onLogout = {
+                        scope.launch {
+                            TokenManager.token = null
+                            TokenStore(context.applicationContext).clear()
+                            navController.navigate(Welcome) {
+                                popUpTo(0) {inclusive = true}
+                            }
+
+                        }
+                    }
                 )
             }
 

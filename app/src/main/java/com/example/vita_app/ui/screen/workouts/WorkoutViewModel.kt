@@ -8,9 +8,11 @@ import com.example.vita_app.data.remote.model.WorkoutEntryResponse
 import com.example.vita_app.data.remote.model.WorkoutResponse
 import com.example.vita_app.data.repository.WorkoutEntryRepo
 import com.example.vita_app.data.repository.WorkoutRepo
+import com.example.vita_app.ui.util.isOnDate
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class WorkoutViewModel: ViewModel() {
     private val workoutRepo = WorkoutRepo()
@@ -22,18 +24,21 @@ class WorkoutViewModel: ViewModel() {
     private val _events = Channel<String>()
     val events = _events.receiveAsFlow()
 
-    val exerciseCalories: Int
-        get() = entries.sumOf { entry ->
-        val perHour = entry.workout.caloriesPerHour.toDoubleOrNull() ?: 0.0
-        val minutes = entry.minutes.toDoubleOrNull() ?: 0.0
-        perHour * minutes / 60.0
-    }.toInt()
+    fun entriesOn(date: LocalDate): List<WorkoutEntryResponse> =
+        entries.filter { isOnDate(it.date, date) }
 
-    val exerciseTime: Int
-        get() = entries.sumOf { entry ->
-            val totalMinutes = entry.minutes.toDoubleOrNull() ?: 0.0
-            totalMinutes
+    fun exerciseCaloriesOn(date: LocalDate): Int =
+        entriesOn(date).sumOf { entry ->
+            val perHour = entry.workout.caloriesPerHour.toDoubleOrNull() ?: 0.0
+            val minutes = entry.minutes.toDoubleOrNull() ?: 0.0
+            perHour * minutes / 60.0
         }.toInt()
+
+    fun exerciseTimeOn(date: LocalDate): Int =
+        entriesOn(date).sumOf{it.minutes.toDoubleOrNull() ?: 0.0}.toInt()
+
+    val exerciseCalories: Int get() = exerciseCaloriesOn(LocalDate.now())
+    val exerciseTime: Int get() = exerciseTimeOn(LocalDate.now())
 
     init {
         loadWorkouts()

@@ -9,9 +9,11 @@ import com.example.vita_app.data.remote.model.MealResponse
 import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.data.repository.EntryRepo
 import com.example.vita_app.data.repository.MealRepo
+import com.example.vita_app.ui.util.isOnDate
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class MealsViewModel: ViewModel() {
     //Se inicializa una instancia del repositorio del api, y un array de Meal's para guardarlo en
@@ -25,12 +27,17 @@ class MealsViewModel: ViewModel() {
     val events = _events.receiveAsFlow()
 
     //Suma de las calorias de TODAS las meals entries
-    val foodCalories: Int
-        get() = entries.sumOf {entry ->
+
+    fun entriesOn(date: LocalDate): List<DiaryEntryResponse> = entries.filter { isOnDate(it.date, date) }
+
+    fun foodCaloriesOn(date: LocalDate): Int =
+        entriesOn(date).sumOf {entry ->
         val calPer100 = entry.meal.calories.toDoubleOrNull() ?: 0.0
         val grams = entry.grams.toDoubleOrNull() ?: 0.0
         calPer100 * grams / 100.0
     }.toInt()
+
+    val foodCalories: Int get() = foodCaloriesOn(LocalDate.now())
 
 
     //Cuando se inicializa la clase, siempre va a cargar la lista de Meals del API

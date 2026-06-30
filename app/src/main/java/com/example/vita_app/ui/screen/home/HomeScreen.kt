@@ -20,6 +20,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -44,7 +45,8 @@ fun HomeScreen(
     onCalorieCardClick: () -> Unit,
     onWorkoutCardClick: () -> Unit,
     mealsViewModel: MealsViewModel,
-    workoutViewModel: WorkoutViewModel
+    workoutViewModel: WorkoutViewModel,
+    onLogout: () -> Unit
 ) {
 
     //Variables para llenar contenido
@@ -70,11 +72,17 @@ fun HomeScreen(
     //Contenido principal de la APP
     AppBackground {
 
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-                ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp))
+        {
 
-                    HomeTopBar("Yo") //
+            HomeTopBar("Yo") //
+
+            TextButton(
+                onClick = onLogout,
+                modifier = Modifier.align(Alignment.End).padding(end = 16.dp)
+            ) {
+                Text("Cerrar sesion", color = PineBlue)
+            }
 
                     Spacer(modifier = Modifier.height(20.dp))
 

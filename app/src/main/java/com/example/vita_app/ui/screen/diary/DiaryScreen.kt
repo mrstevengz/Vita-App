@@ -19,6 +19,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,12 +31,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.ui.components.AppBackground
+import com.example.vita_app.ui.components.DateSelectorRow
 import com.example.vita_app.ui.components.HomeTopBar
 import com.example.vita_app.ui.components.MealSection
 import com.example.vita_app.ui.components.WorkoutSection
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 import com.example.vita_app.ui.theme.CarbonBlack
+import java.time.LocalDate
 
 
 @Composable
@@ -49,17 +55,15 @@ fun DiaryScreen(
         workoutsViewModel.loadEntries()
     }
 
-    val entries =
-        viewModel.entries//Se manda a llamar la variable que contiene la lista de meals ya fetcheadas
-
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     //Uso equivalente a filter en JS, se pasa en el lambda la seccion y meal como (it)
     //Se guarda el resultado (un mapa) en la variable grouped
-    val grouped = entries.groupBy { it.section }
+    val grouped = viewModel.entriesOn(selectedDate).groupBy { it.section }
 
     //Hardcoded goal
     val goal = 2000
-    val foodCalories = viewModel.foodCalories
-    val exerciseCalories = workoutsViewModel.exerciseCalories
+    val foodCalories = viewModel.foodCaloriesOn(selectedDate)
+    val exerciseCalories = workoutsViewModel.exerciseCaloriesOn(selectedDate)
 
     //Remaining cals
     val remaining = goal - foodCalories + exerciseCalories
@@ -71,7 +75,12 @@ fun DiaryScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
-                HomeTopBar("Yo")
+                DateSelectorRow(
+                    date = selectedDate,
+                    onPrev = {selectedDate = selectedDate.minusDays(1)},
+                    onNext = {selectedDate = selectedDate.plusDays(1)},
+                    onToday = {selectedDate = LocalDate.now()}
+                )
             }
 
             item {
@@ -160,7 +169,7 @@ fun DiaryScreen(
             }
             item{
                 WorkoutSection(
-                    entries = workoutsViewModel.entries,
+                    entries = workoutsViewModel.entriesOn(selectedDate),
                     onAddClick = onAddWorkoutClick,
                     onEntryDelete = {entry -> workoutsViewModel.deleteEntry(entry.id)},
                     onEntryClick = {entry -> onWorkoutEditClick(entry.id)}

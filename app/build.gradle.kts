@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.vita_app"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -75,4 +75,5 @@ dependencies {
 
     //DataStore (persistencia)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
 }
