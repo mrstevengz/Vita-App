@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -21,6 +22,8 @@ import com.example.vita_app.ui.screen.login.LoginScreen
 import com.example.vita_app.ui.screen.login.WelcomeScreen
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.toRoute
+import com.example.vita_app.data.TokenManager
+import com.example.vita_app.data.TokenStore
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.screen.addmeal.AddMeal
 import com.example.vita_app.ui.screen.catalog.CatalogScreen
@@ -28,6 +31,7 @@ import com.example.vita_app.ui.screen.diary.DiaryScreen
 import com.example.vita_app.ui.screen.editmeal.EditMealScreen
 import com.example.vita_app.ui.screen.login.AuthEvent
 import com.example.vita_app.ui.screen.login.AuthViewModel
+import com.example.vita_app.ui.screen.login.LoadingScreen
 import com.example.vita_app.ui.screen.login.RegisterScreen
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 import com.example.vita_app.ui.screen.workouts.AddWorkoutScreen
@@ -85,9 +89,27 @@ fun AppNavigation() {
         //en AppBackground y que sean consistentes
         NavHost(
             navController = navController,
-            startDestination = Welcome,
+            startDestination = Splash,
             modifier = Modifier.fillMaxSize()
         ) {
+            //Pantalla de carga
+            composable<Splash> {
+                val context = LocalContext.current
+                LaunchedEffect(Unit) {
+                    val tokenStore = TokenStore(context.applicationContext)
+                    val saved = tokenStore.read()
+
+                    TokenManager.token = saved
+
+                    val destination = if (saved!=null) Home("")
+                    else Welcome
+
+                    navController.navigate(destination) {
+                        popUpTo(Splash) {inclusive = true}
+                    }
+                }
+                LoadingScreen()
+            }
             //Pantalla de bienvenida
 
             composable<Welcome> {

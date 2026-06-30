@@ -1,11 +1,14 @@
 package com.example.vita_app.ui.screen.login
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vita_app.data.TokenManager
+import com.example.vita_app.data.TokenStore
 import com.example.vita_app.data.repository.AuthRepo
 import com.example.vita_app.data.repository.AuthResult
 import kotlinx.coroutines.channels.Channel
@@ -19,8 +22,9 @@ sealed class AuthEvent {
     object RegisterSuccess : AuthEvent()
 }
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(application : Application) : AndroidViewModel(application) {
     private val repo = AuthRepo()
+    private val tokenStore = TokenStore(application)
 
     var isLoading by mutableStateOf(false)
         private set
@@ -35,6 +39,7 @@ class AuthViewModel : ViewModel() {
             when(val result = repo.loginUser(email, password)) {
                 is AuthResult.Success -> {
                     TokenManager.token = result.data
+                    tokenStore.save(result.data)
                     _events.send(AuthEvent.Success(email))
                 }
 

@@ -33,3 +33,6 @@ object WorkoutCatalog
 data class AddWorkout(val workoutId: Int)
 @Serializable
 data class EditWorkout(val entryId: Int)
+
+@Serializable
+object Splash
