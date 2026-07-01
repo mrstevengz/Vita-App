@@ -7,6 +7,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
+// Proposito: Define las rutas de autenticacion de la API: login y registro.
 interface AuthApi {
 
     @POST("auth/login")

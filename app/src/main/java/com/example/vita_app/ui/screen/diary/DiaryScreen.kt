@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,9 +27,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vita_app.data.GoalStore
 import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.ui.components.AppBackground
 import com.example.vita_app.ui.components.DateSelectorRow
@@ -60,8 +63,10 @@ fun DiaryScreen(
     //Se guarda el resultado (un mapa) en la variable grouped
     val grouped = viewModel.entriesOn(selectedDate).groupBy { it.section }
 
-    //Hardcoded goal
-    val goal = 2000
+    val context = LocalContext.current
+    val goalStore = remember { GoalStore(context.applicationContext) }
+    val goal by goalStore.goalFlow.collectAsState(initial = 2000)
+
     val foodCalories = viewModel.foodCaloriesOn(selectedDate)
     val exerciseCalories = workoutsViewModel.exerciseCaloriesOn(selectedDate)
 

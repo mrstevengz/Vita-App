@@ -8,11 +8,15 @@ import com.example.vita_app.data.remote.model.RegisterRequest
 import com.google.gson.Gson
 import retrofit2.Response
 
+// Proposito: Repositorio de autenticacion. Encapsula la llamada a la API y guarda el token recibido.
 
+// Resultado controlado para comunicar exito o error de login al ViewModel.
 sealed class AuthResult {
     data class Success(val data: String) : AuthResult()
     data class Error(val message: String) : AuthResult()
 }
+
+// Capa de datos para autenticacion; evita que la UI conozca detalles de Retrofit.
 class AuthRepo {
     private val api = RetrofitHelper.getInstance().create(AuthApi::class.java)
 
@@ -28,6 +32,7 @@ class AuthRepo {
         }
     }
 
+    // Ejecuta el login en background, guarda token si existe y devuelve un resultado para la UI.
     suspend fun loginUser(email: String, password: String): AuthResult {
         try {
             val res = api.login(LoginRequest(email, password))
@@ -40,6 +45,7 @@ class AuthRepo {
         }
     }
 
+    //Ejecuta el register en background, retorna success y si no manda mensaje de error
     suspend fun registerUser(email: String, password: String): AuthResult {
         try {
             val res = api.register(RegisterRequest(email, password))

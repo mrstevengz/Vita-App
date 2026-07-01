@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+
 class MealsViewModel: ViewModel() {
     //Se inicializa una instancia del repositorio del api, y un array de Meal's para guardarlo en
     // las pantallas y mostrarlo
@@ -38,6 +39,34 @@ class MealsViewModel: ViewModel() {
     }.toInt()
 
     val foodCalories: Int get() = foodCaloriesOn(LocalDate.now())
+
+    data class MacroTotals(val protein: Int, val carbs: Int, val fat: Int)
+
+    fun macrosOnDate(date: LocalDate): MacroTotals {
+        val entries = entriesOn(date)
+
+        val protein = entries.sumOf { entry ->
+            val per100 = entry.meal.protein.toDoubleOrNull() ?: 0.0
+            val grams = entry.grams.toDoubleOrNull() ?: 0.0
+            per100 * grams / 100.0
+        }.toInt()
+
+        val carbs = entries.sumOf { entry ->
+            val per100 = entry.meal.carbs.toDoubleOrNull() ?: 0.0
+            val grams = entry.grams.toDoubleOrNull() ?: 0.0
+            per100 * grams / 100.0
+        }.toInt()
+
+        val fat = entries.sumOf { entry ->
+            val per100 = entry.meal.fat.toDoubleOrNull() ?: 0.0
+            val grams = entry.grams.toDoubleOrNull() ?: 0.0
+            per100 * grams / 100.0
+        }.toInt()
+
+        return MacroTotals(protein, carbs, fat)
+    }
+
+    val macros: MacroTotals get() = macrosOnDate(LocalDate.now())
 
 
     //Cuando se inicializa la clase, siempre va a cargar la lista de Meals del API

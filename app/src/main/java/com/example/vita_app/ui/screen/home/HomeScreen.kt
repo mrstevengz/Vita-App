@@ -2,6 +2,8 @@ package com.example.vita_app.ui.screen.home
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,31 +15,45 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.vita_app.data.GoalStore
 import com.example.vita_app.ui.components.AppBackground
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.components.HomeTopBar
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 import com.example.vita_app.ui.theme.PineBlue
+import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 
 @Composable
@@ -55,7 +71,17 @@ fun HomeScreen(
         mealsViewModel.loadEntries()
         workoutViewModel.loadEntries()
     }
-    val goal = 2000
+
+    //Abrir GoalStore y sacar el valor
+    val context = LocalContext.current
+    val goalStore = remember {
+        GoalStore(context.applicationContext)
+    }
+    val goal by goalStore.goalFlow.collectAsState(initial = 2000)
+
+    val scope = rememberCoroutineScope()
+    var showGoalDialog by remember { mutableStateOf(false ) }
+
     val foodCalories = mealsViewModel.foodCalories
     val exerciseCalories = workoutViewModel.exerciseCalories
     val exerciseTime = workoutViewModel.exerciseTime
@@ -75,7 +101,7 @@ fun HomeScreen(
         Column(modifier = Modifier.fillMaxWidth().padding(top = 16.dp))
         {
 
-            HomeTopBar("Yo") //
+            HomeTopBar("Steven") //
 
             TextButton(
                 onClick = onLogout,
@@ -147,7 +173,8 @@ fun HomeScreen(
                                     Column {
 
                                         Text("Base Goal", color = Color.Gray, fontSize = 12.sp)
-                                        Text("$goal", fontWeight = FontWeight.Bold)
+                                        Text("$goal", fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.clickable{showGoalDialog = true})
 
                                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -179,6 +206,18 @@ fun HomeScreen(
                                         .background(if (it == 0) PineBlue else Color.LightGray)
                                 )
                             }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Fila deslizable de macros (proteina, carbs, grasa) de HOY
+                        val macros = mealsViewModel.macros
+                        Row(
+                            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            MacroCard(label = "Proteina", value = macros.protein, color = PineBlue)
+                            MacroCard(label = "Carbs", value = macros.carbs, color = Color(0xFFEFA83B))
+                            MacroCard(label = "Grasa", value = macros.fat, color = Color(0xFFE0575B))
                         }
 
                         Spacer(modifier = Modifier.height(24.dp))
@@ -241,7 +280,54 @@ fun HomeScreen(
                                     Text("${formatMinutes(exerciseTime)} hr", color = Color.Gray)
                                 }
                             }
-                        } }
+                        }
+                    }
+        }
+
+        if (showGoalDialog) {
+            var input by remember { mutableStateOf(goal.toString()) }
+            AlertDialog(
+                onDismissRequest = { showGoalDialog = false },
+                title = { Text("Editar objetivo") },
+                text = {
+                    OutlinedTextField(
+                        value = input,
+                        onValueChange = { input = it },
+                        label = { Text("Calorías por día") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val newGoal = input.toIntOrNull()
+                        if (newGoal != null && newGoal > 0) {
+                            scope.launch { goalStore.setGoal(newGoal) }   // suspend -> corrutina
+                        }
+                        showGoalDialog = false
+                    }) { Text("Guardar") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showGoalDialog = false }) { Text("Cancelar") }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun MacroCard(label: String, value: Int, color: Color) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = Modifier.width(100.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("${value}g", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = color)
+            Text(label, fontSize = 12.sp, color = Color.Gray)
         }
     }
 }

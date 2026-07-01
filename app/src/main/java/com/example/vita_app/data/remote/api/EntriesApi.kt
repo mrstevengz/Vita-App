@@ -11,6 +11,8 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
+// Proposito: Define las llamadas HTTP para leer y modificar las comidas registradas en el diario del usuario.
+// Interfaz Retrofit para endpoints que requieren Authorization Bearer token.
 interface EntriesApi {
     @GET("entries")
     suspend fun getEntries(

@@ -164,11 +164,6 @@ fun LoginScreen(viewModel: AuthViewModel) {
 
                         Spacer(modifier = Modifier.weight(1f))
 
-                        Text(
-                            "Forget password?",
-                            fontSize = 12.sp,
-                            color = PineBlue
-                        )
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))

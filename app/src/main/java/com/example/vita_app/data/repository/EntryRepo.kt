@@ -7,9 +7,13 @@ import com.example.vita_app.data.remote.model.DiaryEntryRequest
 import com.example.vita_app.data.remote.model.DiaryEntryResponse
 import com.example.vita_app.ui.navigation.Diary
 
+// Proposito: Repositorio de entradas del diario. Agrega el token Bearer a las llamadas protegidas.
+
+// Capa de acceso a las entradas del diario del usuario autenticado.
 class EntryRepo {
     private val api = RetrofitHelper.getInstance().create(EntriesApi::class.java)
 
+    // Construye el encabezado Authorization que exige el backend para rutas privadas.
     private fun bearer(): String = "Bearer ${TokenManager.token}"
 
     //Funciones REST

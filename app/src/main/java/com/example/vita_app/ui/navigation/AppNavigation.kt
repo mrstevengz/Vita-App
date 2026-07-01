@@ -70,6 +70,7 @@ fun AppNavigation() {
     val workoutsViewModel: WorkoutViewModel = viewModel()
 
 
+    //Eventos de notificacion
     val snackbarHostState = remember {
         SnackbarHostState()
     }
