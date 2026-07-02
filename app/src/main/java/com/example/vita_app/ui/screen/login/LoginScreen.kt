@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +21,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import com.example.vita_app.R
@@ -29,175 +34,131 @@ import com.example.vita_app.ui.theme.PastelCyan
 import com.example.vita_app.ui.theme.White
 
 @Composable
-fun LoginScreen(viewModel: AuthViewModel) {
+fun LoginScreen(viewModel: AuthViewModel, onNavigateToRegister: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var rememberMe by remember {mutableStateOf(false)}
+    var showPassword by remember { mutableStateOf(false)}
 
-    // Contenedor principal
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        // HEADER fondio superior
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(320.dp)
-                .background(
-                    // Gradiente de colores
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            LightCyan,
-                            PastelCyan,
-                            SoftTurqoise
-                        )
-
-                    )
-                )
-        ) {
-            Box(
-                // Capa oscura encima (para efecto visual)
-                modifier = Modifier.matchParentSize()
-                    .background(Color.Black.copy(alpha = 0.05f))
-            )
-        }
-
+        // Surface pinta el fondo con el token del tema -> claro/oscuro automático
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(top = 40.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())   // el teclado no tapa los campos
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(Modifier.height(72.dp))
 
-            Spacer(modifier = Modifier.height(80.dp))
-
-            //  LOGO
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(R.drawable.logo),
                 contentDescription = null,
-                modifier = Modifier.size(150.dp)
+                modifier = Modifier.size(96.dp)
             )
 
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // CARD
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(horizontal = 24.dp),
-                shape = RoundedCornerShape(28.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
-                colors = CardDefaults.cardColors(containerColor = White) // Color de fondo de la tarjeta
+            Text(
+                "Bienvenido de nuevo",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "Inicia sesión para continuar",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(Modifier.height(32.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Contraseña") },
+                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                singleLine = true,
+                visualTransformation = if (showPassword) VisualTransformation.None
+                else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { showPassword = !showPassword }) {
+                        Icon(
+                            imageVector = if (showPassword) Icons.Default.VisibilityOff
+                            else Icons.Default.Visibility,
+                            contentDescription = if (showPassword) "Ocultar contraseña"
+                            else "Mostrar contraseña"
+                        )
+                    }
+                },
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Checkbox(checked = rememberMe, onCheckedChange = { rememberMe = it })
+                Text("Recordarme", style = MaterialTheme.typography.bodyMedium)
+            }
 
-                Column(
-                    modifier = Modifier.padding(24.dp)
-                ) {
+            Spacer(Modifier.height(16.dp))
 
-                    Text(
-                        "Welcome!",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = CarbonBlack
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },    // Guarda lo que el usuario escribe
-                        placeholder = { Text("Email") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        singleLine = true
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-
-                    // Estado para mostrar u ocultar contraseña
-                    var showPassword by remember { mutableStateOf(false) }
-
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        placeholder = { Text("Password") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        singleLine = true,
-                        // Si showPassword es true → muestra texto
-                        // si es false → oculta con puntos
-                        visualTransformation = if (showPassword)
-                            VisualTransformation.None
-                        else
-                            PasswordVisualTransformation(),
-                        // Icono para mostrar/ocultar contraseña
-                        trailingIcon = {
-                            Row(
-                                modifier = Modifier
-                                    .clickable { showPassword = !showPassword }
-                                    .padding(end = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = if (showPassword) "Ocultar" else "Mostrar",
-                                    tint = PineBlue,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(2.dp))
-                            }
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        Checkbox(
-                            checked = false, // no guarda estado aún
-                            onCheckedChange = {},
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = PineBlue
-                            )
-                        )
-
-                        Text("Remember me", fontSize = 12.sp)
-
-                        Spacer(modifier = Modifier.weight(1f))
-
+            Button(
+                onClick = {
+                    if (email.isNotEmpty() && password.isNotEmpty()) {
+                        viewModel.login(email, password, rememberMe)
                     }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    Button(
-                        onClick = {
-                            // Solo permite continuar si hay username
-                            if (email.isNotEmpty() && password.isNotEmpty()) {
-                                viewModel.login(email, password) // Llama a la navegación (pantalla Home)
-                            }
-                        },
-                        enabled = !viewModel.isLoading,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(30.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PineBlue
-                        )
-                    ) {
-                        if (viewModel.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = White,
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text("Login", color = White)
-                        }
-                    }
+                },
+                enabled = !viewModel.isLoading,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp)
+            ) {
+                if (viewModel.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(22.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Iniciar sesión")
                 }
             }
-            // Empuja tdo a arriba
-            Spacer(modifier = Modifier.weight(1f))
+
+            Spacer(Modifier.height(20.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "¿No tienes cuenta? ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    "Regístrate",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable { onNavigateToRegister() }
+                )
+            }
         }
     }
 }

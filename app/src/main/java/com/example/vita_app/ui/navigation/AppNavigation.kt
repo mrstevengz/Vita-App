@@ -20,11 +20,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.vita_app.ui.screen.home.HomeScreen
 import com.example.vita_app.ui.screen.login.LoginScreen
-import com.example.vita_app.ui.screen.login.WelcomeScreen
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.toRoute
 import com.example.vita_app.data.TokenManager
 import com.example.vita_app.data.TokenStore
+import com.example.vita_app.data.repository.EntryRepo
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.screen.meals.AddMeal
 import com.example.vita_app.ui.screen.meals.CatalogScreen
@@ -101,28 +101,31 @@ fun AppNavigation() {
                     val tokenStore = TokenStore(context.applicationContext)
                     val saved = tokenStore.read()
 
-                    TokenManager.token = saved
-
-                    val destination = if (saved!=null) Home("")
-                    else Welcome
-
-                    navController.navigate(destination) {
-                        popUpTo(Splash) {inclusive = true}
+                    // Sin token guardado -> a Welcome
+                    if (saved == null) {
+                        navController.navigate(Login) { popUpTo(Splash) { inclusive = true } }
+                        return@LaunchedEffect
                     }
+
+                    // Hay token -> cargarlo y VALIDARLO con una llamada autenticada real
+                    TokenManager.token = saved
+                    val destination = try {
+                        EntryRepo().getEntries()          // 200 -> el token sirve de verdad
+                        Home("")
+                    } catch (e: retrofit2.HttpException) {
+                        if (e.code() == 401 || e.code() == 403) {
+                            // token expirado/inválido -> matar la sesión
+                            TokenManager.token = null
+                            tokenStore.clear()
+                        }
+                        Login                       // auth muerta (o error del server) -> no entrar
+                    } catch (e: Exception) {
+                        Login                      // API caída / sin red -> no entrar (token intacto)
+                    }
+
+                    navController.navigate(destination) { popUpTo(Splash) { inclusive = true } }
                 }
                 LoadingScreen()
-            }
-            //Pantalla de bienvenida
-
-            composable<Welcome> {
-                WelcomeScreen(
-                    onNavigateToLogin = {
-                        navController.navigate(Login) //Navega a la pantalla de Login
-                    },
-                    onRegisterClick = {
-                        navController.navigate(Register)
-                    }
-                )
             }
 
             //Pantalla de Registro
@@ -163,14 +166,16 @@ fun AppNavigation() {
                         when(event) {
                             is AuthEvent.Success ->
                                 navController.navigate(Home(name = event.name)) {
-                                    popUpTo(Welcome) {inclusive = true}
+                                    popUpTo(Login) {inclusive = true}
                                 }
                             is AuthEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
                             is AuthEvent.RegisterSuccess -> {}
                         }
                     }
                 }
-                LoginScreen(viewModel = authViewModel)
+                LoginScreen(viewModel = authViewModel, onNavigateToRegister = {
+                    navController.navigate(Register)
+                })
             }
 
             //Pantalla de Home
@@ -186,7 +191,7 @@ fun AppNavigation() {
                         scope.launch {
                             TokenManager.token = null
                             TokenStore(context.applicationContext).clear()
-                            navController.navigate(Welcome) {
+                            navController.navigate(Login) {
                                 popUpTo(0) {inclusive = true}
                             }
 

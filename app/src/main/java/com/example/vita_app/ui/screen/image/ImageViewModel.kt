@@ -58,4 +58,7 @@ class ImageViewModel(application: Application) : AndroidViewModel(application) {
     fun clear() {
         results = emptyList()
     }
+    fun removeResult(food: DetectedFood) {
+        results = results.filter {it !== food}
+    }
 }

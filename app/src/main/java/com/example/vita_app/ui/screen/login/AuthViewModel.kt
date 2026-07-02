@@ -32,14 +32,15 @@ class AuthViewModel(application : Application) : AndroidViewModel(application) {
     private val _events = Channel<AuthEvent>()
     val events = _events.receiveAsFlow()
 
-    fun login(email: String, password: String) {
+    fun login(email: String, password: String, rememberMe: Boolean) {
         viewModelScope.launch {
             isLoading = true
 
             when(val result = repo.loginUser(email, password)) {
                 is AuthResult.Success -> {
                     TokenManager.token = result.data
-                    tokenStore.save(result.data)
+                    if(rememberMe) tokenStore.save(result.data)
+                    else tokenStore.clear()
                     _events.send(AuthEvent.Success(email))
                 }
 

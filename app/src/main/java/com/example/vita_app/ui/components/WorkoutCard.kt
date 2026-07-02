@@ -11,9 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -27,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,94 +48,100 @@ fun WorkoutSection(
     onEntryClick: (WorkoutEntryResponse) -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text("EXERCISE", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = CarbonBlack)
+        Text(
+            "Ejercicio",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(Modifier.height(8.dp))
-
 
         Card(
             shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(1.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-
             Column {
                 entries.forEach { entry ->
-                    key(entry.id) {
-                        WorkoutEntryRow(entry = entry, onDelete = onEntryDelete, onClick = onEntryClick)
-                    }
+                    key(entry.id) { WorkoutEntryRow(entry, onEntryDelete, onEntryClick) }
                 }
-            }
 
-            Spacer(Modifier.height(8.dp))
-
-            //Add Workout Row
-
-            Row(
-                modifier = Modifier.fillMaxWidth().clickable {onAddClick()}.padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("ADD WORKOUT", color = Color(0xFF1FA3A3), fontWeight = FontWeight.Bold)
-                Text("...", fontSize = 20.sp, color = Color.Gray)
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .clickable { onAddClick() }
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Agregar ejercicio", color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium)
+                }
             }
         }
     }
 }
 
-//Se crea un private row donde se le otorga un swipe, un lambda para pasar un ejercicio y realizar una accion (delete) y el UI
 @Composable
 private fun WorkoutEntryRow(
     entry: WorkoutEntryResponse,
     onDelete: (WorkoutEntryResponse) -> Unit,
     onClick: (WorkoutEntryResponse) -> Unit
 ) {
-    //Se crea un SwipeToDismissBoxState Object
     val dismissState = rememberSwipeToDismissBoxState()
-
-    //Si cambia el valor del dismiss state, se confirma que haya terminado (end to start) y se mand a allamar la funcion
-    //para borrar el row especifico
     LaunchedEffect(dismissState.currentValue) {
-        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            onDelete(entry)
-        }
+        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) onDelete(entry)
     }
 
     val perHour = entry.workout.caloriesPerHour.toDoubleOrNull() ?: 0.0
     val minutes = entry.minutes.toDoubleOrNull() ?: 0.0
     val burned = (perHour * minutes / 60.0).toInt()
 
-    //En el objeto se le asigna un estado (dismiss state), se desactiva la opcion para hacer swipe de derecha a izquierda,
-    // y se le da un diseño. Es el que esta debajo del row y lo que se mira al hacerle swipe
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
         backgroundContent = {
             Box(
-                modifier = Modifier.fillMaxSize().background(Color.Red).padding(horizontal = 20.dp),
+                modifier = Modifier.fillMaxSize()
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                Icon(Icons.Default.Delete, "Delete", tint = Color.White)
+                Icon(Icons.Default.Delete, "Eliminar",
+                    tint = MaterialTheme.colorScheme.onErrorContainer)
             }
         }
     ) {
-        /*Adentro del swipe object, se realiza el row que estara por encima. En este caso el row de ejercicio normal*/
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(vertical = 12.dp, horizontal = 8.dp)
-                .clickable {onClick(entry)},
-
+                .clickable { onClick(entry) }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Izquierda: nombre del ejercicio + minutos
-            Column {
-                Text(entry.workout.name, fontWeight = FontWeight.Medium)
-                Text("${minutes.toInt()} min", fontSize = 12.sp, color = Color.Gray)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier.size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.FitnessCenter, contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                }
+                Spacer(Modifier.width(12.dp))
+                Column {
+                    Text(entry.workout.name, style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+                    Text("${minutes.toInt()} min", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
-            // Derecha: calorías quemadas
-            Text("$burned cal", color = Color.Gray)
+            Text("$burned cal", style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

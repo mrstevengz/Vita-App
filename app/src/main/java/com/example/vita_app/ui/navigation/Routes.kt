@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 
 //RUTAS DE LA APP. CADA DATA CLASS/OBJETO ES UNA PANTALLA
 //Se usan object para pantallas sin parametros, y dataclass para pantallas con ids, nombres, etc
-@Serializable
-object Welcome
 
 @Serializable
 object Register

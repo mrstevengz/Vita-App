@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -89,68 +92,31 @@ fun DiaryScreen(
             }
 
             item {
-                // Panel de calorias
+                val progress = (foodCalories.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f)
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    // Bordes redondeados
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(20.dp),
-                    // Elevación (sombra)
-                    elevation = CardDefaults.cardElevation(6.dp)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(2.dp)
                 ) {
-
-                    Column(modifier = Modifier.padding(16.dp)) {
-
-                        Text(
-                            "Calories Remaining",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = CarbonBlack
+                    Column(Modifier.padding(20.dp)) {
+                        Text("Calorías restantes", style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(4.dp))
+                        Text("$remaining", style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        Spacer(Modifier.height(14.dp))
+                        LinearProgressIndicator(
+                            progress = progress,
+                            modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
                         )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            // GOAL
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$goal", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                                Text("Goal", fontSize = 12.sp, color = Color.Gray)
-                            }
-
-                            Text("-", fontSize = 18.sp)
-
-                            // FOOD
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$foodCalories", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                                Text("Food", fontSize = 12.sp, color = Color.Gray)
-                            }
-
-                            Text("+", fontSize = 18.sp)
-
-                            // EXERCISE
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$exerciseCalories", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                                Text("Exercise", fontSize = 12.sp, color = Color.Gray)
-                            }
-
-                            Text("=", fontSize = 18.sp)
-
-                            // RESULTADO
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    "${remaining.toInt()}",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp,
-                                    color = Color(0xFF1FA3A3)
-                                )
-                                Text("Remaining", fontSize = 12.sp, color = Color.Gray)
-                            }
+                        Spacer(Modifier.height(16.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            CalorieStat("Meta", goal)
+                            CalorieStat("Comida", foodCalories)
+                            CalorieStat("Ejercicio", exerciseCalories)
                         }
                     }
                 }
@@ -164,8 +130,14 @@ fun DiaryScreen(
                     key = {type -> type.name}
             )
             { type ->
+                val label = when (type) {
+                    MealType.BREAKFAST -> "Desayuno"
+                    MealType.LUNCH     -> "Almuerzo"
+                    MealType.DINNER    -> "Cena"
+                    MealType.SNACKS    -> "Snacks"
+                }
                 MealSection(
-                    section = type.name,
+                    section = label,
                     entries = grouped[type].orEmpty(),
                     onAddClick = onAddMealClick,
                     onEntryDelete = {entry -> viewModel.deleteEntry(entry.id)},
@@ -182,5 +154,15 @@ fun DiaryScreen(
             }
 
         }
+    }
+}
+
+@Composable
+private fun CalorieStat(label: String, value: Int) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("$value", style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+        Text(label, style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

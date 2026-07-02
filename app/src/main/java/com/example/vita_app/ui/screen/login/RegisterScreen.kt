@@ -28,7 +28,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -71,179 +74,90 @@ fun RegisterScreen(
     var showConfirmPassword by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(260.dp)
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            LightCyan,
-                            PastelCyan,
-                            SoftTurqoise
-                        )
-                    )
-                )
-        ) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .background(Color.Black.copy(alpha = 0.05f))
-            )
-        }
-
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .imePadding()
-                .padding(top = 32.dp, bottom = 24.dp),
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(Modifier.height(48.dp))
+
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(R.drawable.logo),
                 contentDescription = null,
-                modifier = Modifier.size(120.dp)
+                modifier = Modifier.size(88.dp)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(20.dp))
+            Text("Crear cuenta", style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground)
+            Spacer(Modifier.height(4.dp))
+            Text("Regístrate para empezar", style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(horizontal = 24.dp),
-                shape = RoundedCornerShape(28.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
-                colors = CardDefaults.cardColors(containerColor = White)
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        "Crear cuenta",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = CarbonBlack
-                    )
+            Spacer(Modifier.height(28.dp))
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedTextField(
-                            value = firstName,
-                            onValueChange = { firstName = it },
-                            placeholder = { Text("Nombres") },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(20.dp),
-                            singleLine = true
-                        )
-
-                        OutlinedTextField(
-                            value = lastName,
-                            onValueChange = { lastName = it },
-                            placeholder = { Text("Apellidos") },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(20.dp),
-                            singleLine = true
-                        )
-                    }
-
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        placeholder = { Text("Correo electronico") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                    )
-
-                    OutlinedTextField(
-                        value = phone,
-                        onValueChange = { phone = it },
-                        placeholder = { Text("Numero telefonico") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                    )
-
-                    OutlinedTextField(
-                        value = country,
-                        onValueChange = { country = it },
-                        placeholder = { Text("Pais") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        singleLine = true
-                    )
-
-                    PasswordField(
-                        value = password,
-                        onValueChange = { password = it },
-                        placeholder = "Contrasena",
-                        showPassword = showPassword,
-                        onTogglePassword = { showPassword = !showPassword }
-                    )
-
-                    PasswordField(
-                        value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        placeholder = "Confirmar contrasena",
-                        showPassword = showConfirmPassword,
-                        onTogglePassword = { showConfirmPassword = !showConfirmPassword }
-                    )
-
-                    errorMessage?.let {
-                        Text(
-                            text = it,
-                            color = Color(0xFFB3261E),
-                            fontSize = 12.sp
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            errorMessage = validateRegisterForm(
-                                firstName = firstName,
-                                lastName = lastName,
-                                email = email,
-                                phone = phone,
-                                country = country,
-                                password = password,
-                                confirmPassword = confirmPassword
-                            )
-
-                            if (errorMessage == null) {
-                                viewModel.register(email, password)
-                            }
-                        },
-                        enabled = !viewModel.isLoading,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(30.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PineBlue)
-                    ) {
-                        if(viewModel.isLoading) {
-                            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = White,
-                                strokeWidth = 2.dp)
-                        } else {
-                            Text("Registrarse", color = White)
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Ya tienes cuenta?", fontSize = 12.sp)
-                        TextButton(onClick = onNavigateToLogin) {
-                            Text("Iniciar sesion", color = PineBlue)
-                        }
-                    }
-                }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(firstName, { firstName = it }, placeholder = { Text("Nombres") },
+                    singleLine = true, shape = RoundedCornerShape(16.dp), modifier = Modifier.weight(1f))
+                OutlinedTextField(lastName, { lastName = it }, placeholder = { Text("Apellidos") },
+                    singleLine = true, shape = RoundedCornerShape(16.dp), modifier = Modifier.weight(1f))
             }
+
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(email, { email = it }, placeholder = { Text("Correo electrónico") },
+                singleLine = true, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email))
+
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(phone, { phone = it }, placeholder = { Text("Número telefónico") },
+                singleLine = true, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(country, { country = it }, placeholder = { Text("País") },
+                singleLine = true, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth())
+
+            Spacer(Modifier.height(12.dp))
+            PasswordField(password, { password = it }, "Contraseña", showPassword) { showPassword = !showPassword }
+
+            Spacer(Modifier.height(12.dp))
+            PasswordField(confirmPassword, { confirmPassword = it }, "Confirmar contraseña",
+                showConfirmPassword) { showConfirmPassword = !showConfirmPassword }
+
+            errorMessage?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
+
+            Spacer(Modifier.height(20.dp))
+            Button(
+                onClick = {
+                    errorMessage = validateRegisterForm(firstName, lastName, email, phone, country, password, confirmPassword)
+                    if (errorMessage == null) viewModel.register(email, password)
+                },
+                enabled = !viewModel.isLoading,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp)
+            ) {
+                if (viewModel.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(22.dp),
+                        color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
+                } else Text("Registrarse")
+            }
+
+            Spacer(Modifier.height(16.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("¿Ya tienes cuenta? ", style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Iniciar sesión", style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable { onNavigateToLogin() })
+            }
+            Spacer(Modifier.height(24.dp))
         }
     }
 }
@@ -261,69 +175,30 @@ private fun PasswordField(
         onValueChange = onValueChange,
         placeholder = { Text(placeholder) },
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        visualTransformation = if (showPassword) {
-            VisualTransformation.None
-        } else {
-            PasswordVisualTransformation()
-        },
+        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
-            Row(
-                modifier = Modifier
-                    .clickable { onTogglePassword() }
-                    .padding(end = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            IconButton(onClick = onTogglePassword) {
                 Icon(
-                    imageVector = if (showPassword) {
-                        Icons.Default.VisibilityOff
-                    } else {
-                        Icons.Default.Visibility
-                    },
-                    contentDescription = if (showPassword) "Ocultar" else "Mostrar",
-                    tint = PineBlue,
-                    modifier = Modifier.size(20.dp)
+                    if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    contentDescription = if (showPassword) "Ocultar" else "Mostrar"
                 )
-                Spacer(modifier = Modifier.width(2.dp))
             }
         }
     )
 }
 
 private fun validateRegisterForm(
-    firstName: String,
-    lastName: String,
-    email: String,
-    phone: String,
-    country: String,
-    password: String,
-    confirmPassword: String
+    firstName: String, lastName: String, email: String, phone: String,
+    country: String, password: String, confirmPassword: String
 ): String? {
-    if (
-        firstName.isBlank() ||
-        lastName.isBlank() ||
-        email.isBlank() ||
-        phone.isBlank() ||
-        country.isBlank() ||
-        password.isBlank() ||
-        confirmPassword.isBlank()
-    ) {
+    if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || phone.isBlank() ||
+        country.isBlank() || password.isBlank() || confirmPassword.isBlank())
         return "Completa todos los campos para crear tu cuenta."
-    }
-
-    if (!email.contains("@") || !email.contains(".")) {
-        return "Ingresa un correo electronico valido."
-    }
-
-    if (password.length < 6) {
-        return "La contrasena debe tener al menos 6 caracteres."
-    }
-
-    if (password != confirmPassword) {
-        return "Las contrasenas no coinciden."
-    }
-
+    if (!email.contains("@") || !email.contains(".")) return "Ingresa un correo electrónico válido."
+    if (password.length < 6) return "La contraseña debe tener al menos 6 caracteres."
+    if (password != confirmPassword) return "Las contraseñas no coinciden."
     return null
 }
