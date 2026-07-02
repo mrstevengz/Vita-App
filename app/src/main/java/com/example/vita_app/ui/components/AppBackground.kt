@@ -16,12 +16,12 @@ import com.example.vita_app.ui.theme.MutedOlive
 import com.example.vita_app.ui.theme.PineBlue
 
 @Composable
-fun AppBackground(content: @Composable () -> Unit) {
+fun AppBackground(content: @Composable () -> Unit) { //Recibe un composable como parametro
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        content()
+        content() //Lo introduce aqui
     }
 }

@@ -4,5 +4,6 @@ package com.example.vita_app.data
 
 // Objeto global sencillo para compartir el token entre repositorios protegidos.
 object TokenManager {
+    //Guarda el token en memoria como un singleton (una instancia en toda la app), puede ser null = "no hay sesion o token"
     var token: String? = null
 }

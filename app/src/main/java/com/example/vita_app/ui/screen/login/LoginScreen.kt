@@ -35,6 +35,7 @@ import com.example.vita_app.ui.theme.White
 
 @Composable
 fun LoginScreen(viewModel: AuthViewModel, onNavigateToRegister: () -> Unit) {
+    //Estados locales de variables
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var rememberMe by remember {mutableStateOf(false)}
@@ -94,6 +95,7 @@ fun LoginScreen(viewModel: AuthViewModel, onNavigateToRegister: () -> Unit) {
                 label = { Text("Contraseña") },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 singleLine = true,
+                //Cambia segun showPassowrd. Toggle mostrar/ocultar
                 visualTransformation = if (showPassword) VisualTransformation.None
                 else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -125,10 +127,10 @@ fun LoginScreen(viewModel: AuthViewModel, onNavigateToRegister: () -> Unit) {
             Button(
                 onClick = {
                     if (email.isNotEmpty() && password.isNotEmpty()) {
-                        viewModel.login(email, password, rememberMe)
+                        viewModel.login(email, password, rememberMe) //Llama al VM
                     }
                 },
-                enabled = !viewModel.isLoading,
+                enabled = !viewModel.isLoading, //No permite doublesubmit
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth().height(52.dp)
             ) {

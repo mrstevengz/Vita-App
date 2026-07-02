@@ -18,6 +18,7 @@ data class TokenResponse(
     @SerializedName("token") val token: String
 )
 
+//Forma del cuerpo de error en el backend. EJ. {"error": ""}, error puede que traiga una llave o no, asi que permitimos null
 data class ApiError(
     @SerializedName("error") val error: String?
 )

@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 fun FormScaffold(
     title: String,
     onBack: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit //Column scope ejecuta el contenido como que estuviera en un Column
 ) {
     AppBackground {
         Column(Modifier.fillMaxSize()) {

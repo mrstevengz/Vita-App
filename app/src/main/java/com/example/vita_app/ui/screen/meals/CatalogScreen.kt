@@ -70,25 +70,41 @@ fun CatalogScreen(
     onMealClick: (Int) -> Unit,
     onBack: () -> Unit
 ) {
+    //Lista de comidas del viewmodel de meals
     val catalog = viewModel.meals
+    //Carga las comidas al entrar a la pantalla
     LaunchedEffect(Unit) { viewModel.loadMeals() }
 
+    //Estado local, var porque cambia al ecribir.
     var query by remember { mutableStateOf("") }
+    //Catalogo filtrado por lo que se escribio en el query, se recalcula en cada recomposicion de la variable
     val filtered = catalog.filter { it.name.contains(query, ignoreCase = true) }
 
+    //VM de la imagen, creado dentro de la pantalla
     val imageViewModel: ImageViewModel = viewModel()
+
+    //Context actual, da el entorno y se usa para abrir camara
     val context = LocalContext.current
+
+    //Estado que recuerda que seccion eligio el usuario en el dialogod e resultados. Default desayuno
     var selectedSection by remember { mutableStateOf(MealType.BREAKFAST) }
 
+    //Launcher de la galeria. Abre el selector de fotos del sistema
+    //URI es la foto escogida (o null si se cancela)
     val pickImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri -> if (uri != null) imageViewModel.analyze(uri) }
 
-    //Abrir camara
+    //VARIABLES PARA ABRIR LA CAMARA
 
+
+    //el URI que se crea antes de abrir la camara. Es NULLABLE porque arranca sin la foto
+    //Se guarda aqui porque TakePicture devuelve un boolean, no el uri
     var cameraUri by remember {mutableStateOf<Uri?>(null)}
     var showSourceDialog by remember {mutableStateOf(false)}
+    //Para mostrar el dialogo de camara o galeria
 
+    //Launcher de la camara, success (Boolean), si se tomo la foto, guarda el cameraUri guardado y lo manda a analyze
     val takePhoto = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
@@ -97,10 +113,14 @@ fun CatalogScreen(
         }
     }
 
+
     fun newCameraUri(): Uri {
+        //Busca la carpeta cacheDir/images, y la crea si no existe y devuelve el mismo File
         val dir = File(context.cacheDir, "images").apply { mkdirs() }
+        //Crea un archivo nuevo con un nombre unico
         val file = File(dir, "capture_${System.currentTimeMillis()}.jpg")
         return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        //Envuelve el archivo en un content:// Uri y lo devuelve
     }
 
     LaunchedEffect(Unit) {
@@ -128,6 +148,7 @@ fun CatalogScreen(
                     }
                     Spacer(Modifier.height(12.dp))
 
+                    //Crea una row por cada DetectedFood de la lista
                     imageViewModel.results.forEach { food ->
                         val mealId = food.mealId
                         Row(

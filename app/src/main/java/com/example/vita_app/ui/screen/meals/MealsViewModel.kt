@@ -19,18 +19,26 @@ import java.time.LocalDate
 class MealsViewModel: ViewModel() {
     //Se inicializa una instancia del repositorio del api, y un array de Meal's para guardarlo en
     // las pantallas y mostrarlo
-    private val mealRepo = MealRepo()
-    private val entryRepo = EntryRepo()
+    private val mealRepo = MealRepo() //Catalogo de comidas
+    private val entryRepo = EntryRepo() //Entradas de diario (requieren token)
 
+    //ESTADO OBSERVABLE. La UI lee y recompone al calcular
     val meals = mutableStateListOf<MealResponse>()
     val entries = mutableStateListOf<DiaryEntryResponse>()
+
+    //EVENTOS (snackbars)
+    //Canal privado que solo emite el VM
     private val _events = Channel<String>()
+    //receiveAsFlow expone como Flow de read-only
     val events = _events.receiveAsFlow()
 
-    //Suma de las calorias de TODAS las meals entries
+    //PROPIEDADES calculadas
+
+    //Filtra TODAS las entradas que caen en date (isOnDate convierte la fecha UTC a la local)
 
     fun entriesOn(date: LocalDate): List<DiaryEntryResponse> = entries.filter { isOnDate(it.date, date) }
 
+    //Suma las calorias de todas las comidas en un dia: por cada entrada se obtiene las calorias y los gramos, los cuales luego se calculan en calorias
     fun foodCaloriesOn(date: LocalDate): Int =
         entriesOn(date).sumOf {entry ->
         val calPer100 = entry.meal.calories.toDoubleOrNull() ?: 0.0
@@ -38,10 +46,13 @@ class MealsViewModel: ViewModel() {
         calPer100 * grams / 100.0
     }.toInt()
 
+    //Se guardan las calorias de HOY, get() calcula las calorias cada vez que se leen (no se guarda)
     val foodCalories: Int get() = foodCaloriesOn(LocalDate.now())
 
+    //Contenedor de datos para los 3 macros
     data class MacroTotals(val protein: Int, val carbs: Int, val fat: Int)
 
+    //Suma la proteina/carbs/grasa de un dia(mismo parseo y regla (100g) ya que asi se ingresan los datos, se guardan en MacroTotals para poder acceder a los 3 macros facilmente
     fun macrosOnDate(date: LocalDate): MacroTotals {
         val entries = entriesOn(date)
 
@@ -66,17 +77,20 @@ class MealsViewModel: ViewModel() {
         return MacroTotals(protein, carbs, fat)
     }
 
+    //Atajo para obtener macros de hoy
     val macros: MacroTotals get() = macrosOnDate(LocalDate.now())
 
 
+
     //Cuando se inicializa la clase, siempre va a cargar la lista de Meals del API
+    //Las entradas no se cargan al entrar
     init {
         loadMeals()
     }
 
     //Funcion para cargar los meals existentes.
     fun loadMeals() {
-        viewModelScope.launch {
+        viewModelScope.launch { //viewModelScope.launch arranca una corrutina que esta atada a la vida del viewModel, se cancela si el VM muere (usuario sale de a app) y no bloquea el UI
             //Try Catch para excepciones al cargar
             try {
                 //Manda a llamar la funcion de getMeals al API, y guarda la lista en la lista anterior
@@ -118,8 +132,6 @@ class MealsViewModel: ViewModel() {
 
 
                 //Se manda a llamar de nuevo para mantenerse siempre actualizado con la DB
-                //Como solo se agrega una comida a la vez, no considero que sea TAN
-                // wasteful hacer un HTTP request extra
                 loadEntries()
                 _events.send("Entry added")
             } catch(e: Exception) {
@@ -133,8 +145,6 @@ class MealsViewModel: ViewModel() {
         //Se manda a llamar el metodo de deleteMeal del repositorio, se le pasa el ID y borra todos los meals que
         // coincidan con el ID (solo puede ser 1 al ser unico). Esto se hace con el fin de agilizar la actualizacion del
         //UI para el usuario.
-        /*todo BUSCAR UNA MANERA DE OPTIMIZAR ESTE METODO: UNA OPCION ES BORRAR LOCALMENTE EL ROW PARA EL USUARIO, Y LUEGO
-        *  BORRAR EL REQUEST, EN CASO DE QUE FALLE SE PODRIA VOLVER A PONER EL ROW EN EL UI. */
         viewModelScope.launch {
             try {
                 entryRepo.deleteEntry(id)
@@ -147,12 +157,14 @@ class MealsViewModel: ViewModel() {
         }
     }
 
+    //Para actualizar se manda "current.mealId" (la fk)
     fun updateEntry(id:Int, grams: String, section: MealType) {
         viewModelScope.launch {
             try {
 
-                val current = entries.find { it.id == id } ?: return@launch
+                val current = entries.find { it.id == id } ?: return@launch //Return@launch sale de la corutina, si no existe la ID, lo corta. Si es nulo, corta el lambda
                 entryRepo.updateEntry(id, DiaryEntryRequest(current.mealId, grams, section))
+                //Se manda a llamar de nuevo para mantenerse siempre actualizado con la DB
                 loadEntries()
                 _events.send("Entry updated")
             } catch (ex: Exception) {

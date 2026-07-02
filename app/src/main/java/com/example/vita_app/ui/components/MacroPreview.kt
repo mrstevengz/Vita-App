@@ -22,7 +22,8 @@ import kotlin.text.toInt
 
 @Composable
 fun MacroPreview(meal: MealResponse, grams: String, modifier: Modifier = Modifier) {
-    val factor = (grams.toDoubleOrNull() ?: 0.0) / 100.0
+    //Se proyecta cuanto se agregara segun los gramos que se escriben
+    val factor = (grams.toDoubleOrNull() ?: 0.0) / 100.0 //Fraccion con respecto a 100g
     val cals    = ((meal.calories.toDoubleOrNull() ?: 0.0) * factor).toInt()
     val protein = ((meal.protein.toDoubleOrNull()  ?: 0.0) * factor).toInt()
     val carbs   = ((meal.carbs.toDoubleOrNull()    ?: 0.0) * factor).toInt()

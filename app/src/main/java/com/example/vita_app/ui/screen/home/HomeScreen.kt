@@ -84,12 +84,14 @@ fun HomeScreen(
         workoutViewModel.loadEntries()
     }
 
+    //Recoge las variables Context del viewmodel y las manda a llamar para cargarlas en UI
     val context = LocalContext.current
     val goalStore = remember { GoalStore(context.applicationContext) }
     val goal by goalStore.goalFlow.collectAsState(initial = 2000)
     val scope = rememberCoroutineScope()
     var showGoalDialog by remember { mutableStateOf(false) }
 
+    //Variables derivadas del viewmodel
     val foodCalories = mealsViewModel.foodCalories
     val exerciseCalories = workoutViewModel.exerciseCalories
     val exerciseTime = workoutViewModel.exerciseTime
@@ -97,12 +99,14 @@ fun HomeScreen(
     val macros = mealsViewModel.macros
     val todayMeals = mealsViewModel.entriesOn(LocalDate.now())
 
+    //Hace que los minutos se muestren en horas (para el card de ejercicio)
     fun formatMinutes(min: Int) = "${min / 60}:${"%02d".format(min % 60)}"
 
     val ringTrack = MaterialTheme.colorScheme.surfaceVariant
     val ringProgress = if (remaining < 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    //Progreso de 0 a 1 para el anillo
     val progress = (foodCalories.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f)
-    val todayLabel = remember {
+    val todayLabel = remember { //Se calcula una vez la fecha
         LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMM", Locale("es")))
     }
 
@@ -251,6 +255,7 @@ fun HomeScreen(
                 },
                 confirmButton = {
                     TextButton(onClick = {
+                        //String -> Int?, solo si es mayor a 0. Si sobrevive guarda, si algo falla no hace nada
                         input.toIntOrNull()?.takeIf { it > 0 }?.let { scope.launch { goalStore.setGoal(it) } }
                         showGoalDialog = false
                     }) { Text("Guardar") }

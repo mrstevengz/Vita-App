@@ -62,15 +62,18 @@ fun DiaryScreen(
         workoutsViewModel.loadEntries()
     }
 
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) } //El dia que se esta viendo
     //Uso equivalente a filter en JS, se pasa en el lambda la seccion y meal como (it)
+
     //Se guarda el resultado (un mapa) en la variable grouped
     val grouped = viewModel.entriesOn(selectedDate).groupBy { it.section }
 
+    //Context para el GoalStore
     val context = LocalContext.current
     val goalStore = remember { GoalStore(context.applicationContext) }
-    val goal by goalStore.goalFlow.collectAsState(initial = 2000)
+    val goal by goalStore.goalFlow.collectAsState(initial = 2000) //Flow hace que sea un estado reactivo
 
+    //Variables derivadas basadas en la fecha
     val foodCalories = viewModel.foodCaloriesOn(selectedDate)
     val exerciseCalories = workoutsViewModel.exerciseCaloriesOn(selectedDate)
 

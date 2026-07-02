@@ -29,9 +29,9 @@ fun DateSelectorRow(
 ) {
     val today = LocalDate.now()
     val label = when (date) {
-        today -> "Hoy"
-        today.minusDays(1) -> "Ayer"
-        else -> date.format(DateTimeFormatter.ofPattern("EEE d MMM"))
+        today -> "Hoy" //Si es hoy se escribe
+        today.minusDays(1) -> "Ayer" //Si es ayer se escribe
+        else -> date.format(DateTimeFormatter.ofPattern("EEE d MMM")) //Si no, fecha completa
     }
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
@@ -49,7 +49,7 @@ fun DateSelectorRow(
         )
         IconButton(
             onClick = onNext,
-            enabled = date.isBefore(today)                // no dejar navegar al futuro
+            enabled = date.isBefore(today)                // no dejar navegar al futuro (logica)
         ) {
             Icon(Icons.AutoMirrored.Filled.ArrowForward, "Día siguiente")
         }

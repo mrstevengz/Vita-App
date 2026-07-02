@@ -95,6 +95,7 @@ private fun WorkoutEntryRow(
         if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) onDelete(entry)
     }
 
+    //Calorias quemadas de esa fila
     val perHour = entry.workout.caloriesPerHour.toDoubleOrNull() ?: 0.0
     val minutes = entry.minutes.toDoubleOrNull() ?: 0.0
     val burned = (perHour * minutes / 60.0).toInt()

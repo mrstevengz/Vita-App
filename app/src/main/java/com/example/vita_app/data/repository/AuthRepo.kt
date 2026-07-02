@@ -12,8 +12,8 @@ import retrofit2.Response
 
 // Resultado controlado para comunicar exito o error de login al ViewModel.
 sealed class AuthResult {
-    data class Success(val data: String) : AuthResult()
-    data class Error(val message: String) : AuthResult()
+    data class Success(val data: String) : AuthResult() //Lleva el token
+    data class Error(val message: String) : AuthResult() //Lleva el mensaje de error
 }
 
 // Capa de datos para autenticacion; evita que la UI conozca detalles de Retrofit.
@@ -23,6 +23,7 @@ class AuthRepo {
     //Mensaje de error segun codigo HTTP.
 
     private fun parseError(res: Response<*>): String {
+        //When funciona como un Switch
         return when (res.code()) {
             400 -> "Datos invalidos"
             401 -> "Correo o contraseña incorrectos"
@@ -37,6 +38,7 @@ class AuthRepo {
         try {
             val res = api.login(LoginRequest(email, password))
             if (res.isSuccessful)
+                //?: Elvis operator, si el token es nullo, retorna el error en vez de crashear
                 return AuthResult.Success(res.body()?.token ?: return AuthResult.Error("Empty token") )
             else
                 return AuthResult.Error(parseError(res))

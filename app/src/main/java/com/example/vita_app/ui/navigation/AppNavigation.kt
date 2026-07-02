@@ -53,7 +53,7 @@ import java.util.Map.entry
 @Composable
 fun AppNavigation() {
     //INICIALIZAR NAV CONTROLLER
-    val navController = rememberNavController()
+    val navController = rememberNavController() //El router de la aplicacion, recuerda donde esta y el stack
 
 
 
@@ -72,16 +72,18 @@ fun AppNavigation() {
         } == true //== true hace que acepte nulos como verdaderos, ya que puede haber nulos con el ?
     }
 
-    //Se inicializa un viewmodel meals.
+    //VMs compartidos por TODAS las pantallas.
     val mealsViewModel: MealsViewModel = viewModel()
     val workoutsViewModel: WorkoutViewModel = viewModel()
 
 
-    //Eventos de notificacion
+    //El estado del host de snackbars (recuerda quien muestra/oculta el snackbar)
     val snackbarHostState = remember {
         SnackbarHostState()
     }
 
+    //Se escuchan los eventos de los VMs compartidos para no perder eventos al cambiar de pantalla.
+    //Cada evento muestra un snackbar.
     LaunchedEffect(Unit) {
         mealsViewModel.events.collect { message -> snackbarHostState.showSnackbar(message) }
     }
@@ -103,21 +105,21 @@ fun AppNavigation() {
             }
         },
         bottomBar = {
-            if (showBottomBar) BottomBar(navController)
+            if (showBottomBar) BottomBar(navController) //Barra solo en Home y Diary
         }
-    ) { _ -> //Ignoro el padding de scaffold con _, para darle su padding propio a todas las pantallas
+    ) { _ -> //Ignora el padding de scaffold con _, para darle su padding propio a todas las pantallas
         //en AppBackground y que sean consistentes
         NavHost(
             navController = navController,
-            startDestination = Splash,
+            startDestination = Splash, //La app arranca en el Splash
             modifier = Modifier.fillMaxSize()
         ) {
             //Pantalla de carga
             composable<Splash> {
-                val context = LocalContext.current
-                LaunchedEffect(Unit) {
+                val context = LocalContext.current //Se le da el Context para leer tokens
+                LaunchedEffect(Unit) { //Corre una vez al entrar a Splash
                     val tokenStore = TokenStore(context.applicationContext)
-                    val saved = tokenStore.read()
+                    val saved = tokenStore.read() //Hay un token guardado? (.first, si)
 
                     // Sin token guardado -> a Welcome
                     if (saved == null) {
@@ -149,8 +151,10 @@ fun AppNavigation() {
             //Pantalla de Registro
 
            composable<Register> {
-               val authViewModel: AuthViewModel = viewModel()
+               val authViewModel: AuthViewModel = viewModel() //Se le da un authViewModel a Register
 
+
+               //Recolecta todos los eventos y dependiendo de cual hace una accion, llama a las 3 en AuthEvent object
                LaunchedEffect(Unit) {
                    authViewModel.events.collect {
                        event -> when (event) {
@@ -168,7 +172,8 @@ fun AppNavigation() {
                RegisterScreen(
                    viewModel = authViewModel,
                    onNavigateToLogin = {
-                       navController.navigate(Login) {
+                       navController.navigate(Login) { //Navigate(ruta) apila una pantalla nueva al stack
+                           //Navega a login, y saca todas las pantallas que esten arriba de register, inclusive tambien quita register
                            popUpTo(Register) {inclusive = true}
                        }
                    }
@@ -212,7 +217,7 @@ fun AppNavigation() {
                             mealsViewModel.clear()
                             workoutsViewModel.clear()
                             navController.navigate(Login) {
-                                popUpTo(0) {inclusive = true}
+                                popUpTo(0) {inclusive = true} //PopUpTo 0 quita TODA LA PILA
                             }
 
                         }
@@ -232,7 +237,9 @@ fun AppNavigation() {
             }
 
             composable<Catalog> { entry ->
-                val args = entry.toRoute<Catalog>()
+                val args = entry.toRoute<Catalog>() //Entry es el navBackStackEntry de la pantalla
+                //ToRoute lo deserializa de vuelva al objeto (Catalog)
+                //Ahora args es el string que se pasa al navegar
                 CatalogScreen(
                     viewModel = mealsViewModel,
                     onMealClick = { id ->

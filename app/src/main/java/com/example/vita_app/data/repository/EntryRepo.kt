@@ -5,7 +5,6 @@ import com.example.vita_app.data.TokenManager
 import com.example.vita_app.data.remote.api.EntriesApi
 import com.example.vita_app.data.remote.model.DiaryEntryRequest
 import com.example.vita_app.data.remote.model.DiaryEntryResponse
-import com.example.vita_app.ui.navigation.Diary
 
 // Proposito: Repositorio de entradas del diario. Agrega el token Bearer a las llamadas protegidas.
 

@@ -8,10 +8,10 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface ImageApi {
-    @Multipart
+    @Multipart //El cuerpo va como FormData, no JSON
     @POST("analyze")
     suspend fun analyze(
         @Header("Authorization") token: String,
-        @Part image: MultipartBody.Part
+        @Part image: MultipartBody.Part //El archivo/foto que se envia
     ): AnalyzeResponse
 }

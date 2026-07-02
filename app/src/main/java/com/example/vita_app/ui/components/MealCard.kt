@@ -91,18 +91,22 @@ private fun EntryRow(
     onDelete: (DiaryEntryResponse) -> Unit,
     onClick: (DiaryEntryResponse) -> Unit
 ) {
+    //Estadi del gesto de deslizar (lo calcula cada vez que cambia)
     val dismissState = rememberSwipeToDismissBoxState()
+    //Se re-ejecuta cuando el valor del swipe cambia
     LaunchedEffect(dismissState.currentValue) {
+        //Si se deslizo de der a izquierda, se dispara el borrado
         if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) onDelete(entry)
     }
 
+    //Valores del entry
     val per100 = entry.meal.calories.toDoubleOrNull() ?: 0.0
     val grams = entry.grams.toDoubleOrNull() ?: 0.0
     val totalCal = (per100 * grams / 100.0).toInt()
 
     SwipeToDismissBox(
-        state = dismissState,
-        enableDismissFromStartToEnd = false,
+        state = dismissState, //Estado que se observa
+        enableDismissFromStartToEnd = false, //Permite deslizar solo en una direccion
         backgroundContent = {
             Box(
                 modifier = Modifier.fillMaxSize()
