@@ -1,6 +1,12 @@
 package com.example.vita_app.ui.screen.meals
 
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,17 +31,24 @@ import androidx.compose.ui.unit.dp
 import com.example.vita_app.ui.components.AppBackground
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.vita_app.ui.screen.image.ImageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +67,62 @@ fun CatalogScreen(
 
     val filtered = catalog.filter { it.name.contains(query, ignoreCase = true) }
 
+    //Analisis por imagen
+
+    val imageViewModel: ImageViewModel = viewModel()
+    val context = LocalContext.current
+
+    //Photo Picker
+    val pickImage = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) imageViewModel.analyze(uri)
+    }
+
+    LaunchedEffect(Unit) {
+        imageViewModel.events.collect { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    if (imageViewModel.results.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = {imageViewModel.clear()},
+            title = {Text("Comidas detectadas")},
+            text = {
+                Column{
+                    imageViewModel.results.forEach {food ->
+                        val mealId = food.mealId
+                        if(mealId != null) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().clickable {
+                                    imageViewModel.clear()
+                                    onMealClick(mealId)
+                                }
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("${food.mealName} (~${food.estimatedGrams.toInt()} g)")
+                                Text("Agregar", color = Color(0xFF1FA3A3))
+                            }
+                        } else {
+                            Text(
+                                "${food.detectedName} — sin match",
+                                color = Color.Gray,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {imageViewModel.clear() }) {Text("Cerrar")}
+            }
+        )
+
+    }
+
+
     AppBackground {
         Column(modifier = Modifier.fillMaxSize()) {
             CenterAlignedTopAppBar(
@@ -62,8 +131,19 @@ fun CatalogScreen(
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Volver")
                 }
                 },
+                actions = {
+                    IconButton(onClick = {
+                        pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    }) {
+                        Icon(Icons.Default.PhotoCamera, contentDescription = "Escanear comida")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
+
+            if (imageViewModel.isLoading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
 
             OutlinedTextField(
                 value = query,
