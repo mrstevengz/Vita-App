@@ -2,7 +2,11 @@ package com.example.vita_app.ui.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -12,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -24,6 +29,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.toRoute
 import com.example.vita_app.data.TokenManager
 import com.example.vita_app.data.TokenStore
+import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.data.repository.EntryRepo
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.screen.meals.AddMeal
@@ -40,6 +46,7 @@ import com.example.vita_app.ui.screen.workouts.EditWorkoutScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutCatalogScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 import kotlinx.coroutines.launch
+import java.util.Map.entry
 
 
 @SuppressLint("RestrictedApi")
@@ -83,7 +90,18 @@ fun AppNavigation() {
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState)},
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    shape = RoundedCornerShape(16.dp),                          // esquinas suaves
+                    containerColor = MaterialTheme.colorScheme.inverseSurface,   // barra oscura M3
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    actionColor = MaterialTheme.colorScheme.inversePrimary,      // acento teal en la acción
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp) // lo despega de los bordes -> se ve "flotante"
+                )
+            }
+        },
         bottomBar = {
             if (showBottomBar) BottomBar(navController)
         }
@@ -191,6 +209,8 @@ fun AppNavigation() {
                         scope.launch {
                             TokenManager.token = null
                             TokenStore(context.applicationContext).clear()
+                            mealsViewModel.clear()
+                            workoutsViewModel.clear()
                             navController.navigate(Login) {
                                 popUpTo(0) {inclusive = true}
                             }
@@ -204,18 +224,19 @@ fun AppNavigation() {
                 DiaryScreen(
                     viewModel = mealsViewModel,
                     workoutsViewModel = workoutsViewModel,
-                    onAddMealClick = {navController.navigate(Catalog)},
+                    onAddMealClick = {section -> navController.navigate(Catalog(section.name))},
                     onMealEditClick = {id -> navController.navigate(EditMeal(id))},
                     onAddWorkoutClick = {navController.navigate(WorkoutCatalog)},
                     onWorkoutEditClick = {id -> navController.navigate(EditWorkout(id))}
                 )
             }
 
-            composable<Catalog> {
+            composable<Catalog> { entry ->
+                val args = entry.toRoute<Catalog>()
                 CatalogScreen(
                     viewModel = mealsViewModel,
                     onMealClick = { id ->
-                        navController.navigate(AddMeal(id))
+                        navController.navigate(AddMeal(id, args.section))
                     },
                     onBack = {
                         navController.popBackStack()
@@ -228,8 +249,9 @@ fun AppNavigation() {
                 AddMeal(
                     viewModel = mealsViewModel,
                     mealId = args.mealId,
+                    initialSection = MealType.valueOf(args.section),
                     onMealAdd = {
-                        navController.popBackStack(Catalog, inclusive = true)
+                        navController.popBackStack(Catalog(args.section), inclusive = true)
                     },
                     onBack = {
                         navController.popBackStack()

@@ -17,9 +17,9 @@ data class Home(val name : String)
 data class Diary(val name : String)
 
 @Serializable
-object Catalog
+data class Catalog(val section: String)
 @Serializable
-data class AddMeal(val mealId: Int)
+data class AddMeal(val mealId: Int, val section: String)
 @Serializable
 data class EditMeal(val mealId: Int)
 

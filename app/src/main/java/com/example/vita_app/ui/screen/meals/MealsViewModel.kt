@@ -102,6 +102,10 @@ class MealsViewModel: ViewModel() {
         }
     }
 
+    fun clear() {
+        entries.clear()
+    }
+
     // -- Acciones del diario ------------------
 
     fun addEntry(mealId: Int, grams: String, section: MealType) {

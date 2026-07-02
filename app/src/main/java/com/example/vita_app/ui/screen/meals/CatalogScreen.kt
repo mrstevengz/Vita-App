@@ -1,5 +1,6 @@
 package com.example.vita_app.ui.screen.meals
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -55,10 +56,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.ui.screen.image.ImageViewModel
 import com.example.vita_app.ui.util.label
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,6 +83,25 @@ fun CatalogScreen(
     val pickImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri -> if (uri != null) imageViewModel.analyze(uri) }
+
+    //Abrir camara
+
+    var cameraUri by remember {mutableStateOf<Uri?>(null)}
+    var showSourceDialog by remember {mutableStateOf(false)}
+
+    val takePhoto = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) cameraUri?.let {
+            imageViewModel.analyze(it)
+        }
+    }
+
+    fun newCameraUri(): Uri {
+        val dir = File(context.cacheDir, "images").apply { mkdirs() }
+        val file = File(dir, "capture_${System.currentTimeMillis()}.jpg")
+        return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    }
 
     LaunchedEffect(Unit) {
         imageViewModel.events.collect { msg ->
@@ -143,6 +165,31 @@ fun CatalogScreen(
         )
     }
 
+    if (showSourceDialog) {
+        AlertDialog(
+            onDismissRequest = { showSourceDialog = false },
+            title = { Text("Escanear comida") },
+            text = { Text("¿De dónde tomamos la foto?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSourceDialog = false
+                    val uri = newCameraUri()
+                    cameraUri = uri
+                    takePhoto.launch(uri)
+                }) { Text("Tomar foto") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showSourceDialog = false
+                    pickImage.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }) { Text("Elegir de galería") }
+            }
+        )
+    }
+
+
     AppBackground {
         Column(modifier = Modifier.fillMaxSize()) {
             CenterAlignedTopAppBar(
@@ -154,7 +201,7 @@ fun CatalogScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        showSourceDialog = true
                     }) {
                         Icon(Icons.Default.PhotoCamera, contentDescription = "Escanear comida")
                     }

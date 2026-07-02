@@ -42,11 +42,11 @@ import com.example.vita_app.ui.util.label
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddMeal(viewModel: MealsViewModel, mealId: Int, onMealAdd: () -> Unit, onBack: () -> Unit) {
+fun AddMeal(viewModel: MealsViewModel, mealId: Int, onMealAdd: () -> Unit, onBack: () -> Unit, initialSection: MealType) {
     val meal = viewModel.meals.find { it.id == mealId } ?: return
 
     var grams by remember { mutableStateOf("") }
-    var section by remember { mutableStateOf(MealType.BREAKFAST) }
+    var section by remember { mutableStateOf(initialSection) }
     var submit by remember { mutableStateOf(false) }
 
     FormScaffold(title = "Agregar comida", onBack = onBack) {

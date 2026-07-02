@@ -69,6 +69,10 @@ class WorkoutViewModel: ViewModel() {
         }
     }
 
+    fun clear() {
+        entries.clear()
+    }
+
     fun addEntry(workoutId: Int, minutes: String) {
         viewModelScope.launch {
             try {

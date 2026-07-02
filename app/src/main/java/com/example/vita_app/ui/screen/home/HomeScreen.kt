@@ -64,6 +64,7 @@ import com.example.vita_app.ui.components.HomeTopBar
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 import com.example.vita_app.ui.theme.PineBlue
+import com.example.vita_app.ui.util.formatted
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -99,7 +100,7 @@ fun HomeScreen(
     fun formatMinutes(min: Int) = "${min / 60}:${"%02d".format(min % 60)}"
 
     val ringTrack = MaterialTheme.colorScheme.surfaceVariant
-    val ringProgress = MaterialTheme.colorScheme.primary
+    val ringProgress = if (remaining < 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     val progress = (foodCalories.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f)
     val todayLabel = remember {
         LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMM", Locale("es")))
@@ -141,21 +142,25 @@ fun HomeScreen(
                 Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(128.dp)) {
                         Canvas(Modifier.fillMaxSize()) {
-                            drawArc(ringTrack, 0f, 360f, false, style = Stroke(22f, cap = StrokeCap.Round))
-                            drawArc(ringProgress, -90f, progress * 360f, false, style = Stroke(22f, cap = StrokeCap.Round))
+                            drawArc(ringTrack, 0f, 360f, false, style = Stroke(30f, cap = StrokeCap.Round))
+                            drawArc(ringProgress, -90f, progress * 360f, false, style = Stroke(30f, cap = StrokeCap.Round))
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("$remaining", style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Text(remaining.formatted(), style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = if(remaining < 0)
+                                    MaterialTheme.colorScheme.error
+                                        else
+                                    MaterialTheme.colorScheme.onSurface)
                             Text("kcal restantes", style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     Spacer(Modifier.width(20.dp))
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        StatItem("Meta", "$goal") { showGoalDialog = true }
-                        StatItem("Comida", "$foodCalories")
-                        StatItem("Ejercicio", "$exerciseCalories")
+                        StatItem("Meta", goal.formatted()) { showGoalDialog = true }
+                        StatItem("Comida", foodCalories.formatted())
+                        StatItem("Ejercicio", exerciseCalories.formatted())
                     }
                 }
             }
@@ -198,7 +203,7 @@ fun HomeScreen(
                         Icon(Icons.Default.Add, "Agregar ejercicio", tint = MaterialTheme.colorScheme.primary)
                     }
                     Spacer(Modifier.height(8.dp))
-                    Text("$exerciseCalories cal quemadas", fontWeight = FontWeight.Medium,
+                    Text("${exerciseCalories.formatted()} cal quemadas", fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface)
                     Text("${formatMinutes(exerciseTime)} h", style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -303,7 +308,7 @@ private fun TodayMealRow(entry: DiaryEntryResponse) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        Text("$cal cal", style = MaterialTheme.typography.bodySmall,
+        Text("${cal.formatted()} cal", style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

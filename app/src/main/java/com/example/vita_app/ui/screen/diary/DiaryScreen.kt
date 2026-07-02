@@ -44,6 +44,7 @@ import com.example.vita_app.ui.components.WorkoutSection
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 import com.example.vita_app.ui.theme.CarbonBlack
+import com.example.vita_app.ui.util.formatted
 import java.time.LocalDate
 
 
@@ -51,7 +52,7 @@ import java.time.LocalDate
 fun DiaryScreen(
     viewModel: MealsViewModel, //Se manda a llamar el viewmodel de Meals para obtener los metodos
     workoutsViewModel: WorkoutViewModel,
-    onAddMealClick: () -> Unit,
+    onAddMealClick: (MealType) -> Unit,
     onMealEditClick: (Int) -> Unit,
     onAddWorkoutClick: () -> Unit,
     onWorkoutEditClick: (Int) -> Unit
@@ -103,13 +104,18 @@ fun DiaryScreen(
                         Text("Calorías restantes", style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(4.dp))
-                        Text("$remaining", style = MaterialTheme.typography.headlineLarge,
-                            fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        Text(remaining.formatted(), style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold, color =
+                                if(remaining < 0)
+                                MaterialTheme.colorScheme.error
+                                else
+                                MaterialTheme.colorScheme.onSurface )
                         Spacer(Modifier.height(14.dp))
                         LinearProgressIndicator(
                             progress = progress,
                             modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
-                            color = MaterialTheme.colorScheme.primary,
+                            color = if (remaining < 0) MaterialTheme.colorScheme.error
+                                    else MaterialTheme.colorScheme.onSurfaceVariant,
                             trackColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                         Spacer(Modifier.height(16.dp))
@@ -139,7 +145,7 @@ fun DiaryScreen(
                 MealSection(
                     section = label,
                     entries = grouped[type].orEmpty(),
-                    onAddClick = onAddMealClick,
+                    onAddClick = {onAddMealClick(type)},
                     onEntryDelete = {entry -> viewModel.deleteEntry(entry.id)},
                     onEntryClick = {entry -> onMealEditClick(entry.id)}
                 )
@@ -160,7 +166,7 @@ fun DiaryScreen(
 @Composable
 private fun CalorieStat(label: String, value: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("$value", style = MaterialTheme.typography.titleMedium,
+        Text(value.formatted(), style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
         Text(label, style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
