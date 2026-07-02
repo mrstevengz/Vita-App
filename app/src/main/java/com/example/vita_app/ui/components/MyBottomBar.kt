@@ -39,7 +39,7 @@ fun BottomBar(navController: NavController) {
                 }
             } },
             icon = { Icon(Icons.Default.Home, contentDescription = null) },
-            label = { Text("Home") }
+            label = { Text("Inicio") }
         )
         NavigationBarItem(
             selected = currentDestination?.hierarchy?.any {
@@ -52,8 +52,8 @@ fun BottomBar(navController: NavController) {
                     saveState = true
                 }
             } },
-            icon = { Icon(Icons.Default.Dashboard, contentDescription = null) },
-            label = { Text("Diary") }
+            icon = { Icon(Icons.Default.Book, contentDescription = null) },
+            label = { Text("Diario") }
         )
     }
 }

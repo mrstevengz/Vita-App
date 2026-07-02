@@ -16,19 +16,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vita_app.data.GoalStore
 import com.example.vita_app.data.remote.model.MealType
 import com.example.vita_app.ui.components.AppBackground
 import com.example.vita_app.ui.components.DateSelectorRow
@@ -38,6 +44,7 @@ import com.example.vita_app.ui.components.WorkoutSection
 import com.example.vita_app.ui.screen.meals.MealsViewModel
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 import com.example.vita_app.ui.theme.CarbonBlack
+import com.example.vita_app.ui.util.formatted
 import java.time.LocalDate
 
 
@@ -45,7 +52,7 @@ import java.time.LocalDate
 fun DiaryScreen(
     viewModel: MealsViewModel, //Se manda a llamar el viewmodel de Meals para obtener los metodos
     workoutsViewModel: WorkoutViewModel,
-    onAddMealClick: () -> Unit,
+    onAddMealClick: (MealType) -> Unit,
     onMealEditClick: (Int) -> Unit,
     onAddWorkoutClick: () -> Unit,
     onWorkoutEditClick: (Int) -> Unit
@@ -55,13 +62,18 @@ fun DiaryScreen(
         workoutsViewModel.loadEntries()
     }
 
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) } //El dia que se esta viendo
     //Uso equivalente a filter en JS, se pasa en el lambda la seccion y meal como (it)
+
     //Se guarda el resultado (un mapa) en la variable grouped
     val grouped = viewModel.entriesOn(selectedDate).groupBy { it.section }
 
-    //Hardcoded goal
-    val goal = 2000
+    //Context para el GoalStore
+    val context = LocalContext.current
+    val goalStore = remember { GoalStore(context.applicationContext) }
+    val goal by goalStore.goalFlow.collectAsState(initial = 2000) //Flow hace que sea un estado reactivo
+
+    //Variables derivadas basadas en la fecha
     val foodCalories = viewModel.foodCaloriesOn(selectedDate)
     val exerciseCalories = workoutsViewModel.exerciseCaloriesOn(selectedDate)
 
@@ -84,68 +96,36 @@ fun DiaryScreen(
             }
 
             item {
-                // Panel de calorias
+                val progress = (foodCalories.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f)
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    // Bordes redondeados
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(20.dp),
-                    // Elevación (sombra)
-                    elevation = CardDefaults.cardElevation(6.dp)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(2.dp)
                 ) {
-
-                    Column(modifier = Modifier.padding(16.dp)) {
-
-                        Text(
-                            "Calories Remaining",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = CarbonBlack
+                    Column(Modifier.padding(20.dp)) {
+                        Text("Calorías restantes", style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(4.dp))
+                        Text(remaining.formatted(), style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold, color =
+                                if(remaining < 0)
+                                MaterialTheme.colorScheme.error
+                                else
+                                MaterialTheme.colorScheme.onSurface )
+                        Spacer(Modifier.height(14.dp))
+                        LinearProgressIndicator(
+                            progress = progress,
+                            modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
+                            color = if (remaining < 0) MaterialTheme.colorScheme.error
+                                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
                         )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            // GOAL
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$goal", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                                Text("Goal", fontSize = 12.sp, color = Color.Gray)
-                            }
-
-                            Text("-", fontSize = 18.sp)
-
-                            // FOOD
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$foodCalories", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                                Text("Food", fontSize = 12.sp, color = Color.Gray)
-                            }
-
-                            Text("+", fontSize = 18.sp)
-
-                            // EXERCISE
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$exerciseCalories", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                                Text("Exercise", fontSize = 12.sp, color = Color.Gray)
-                            }
-
-                            Text("=", fontSize = 18.sp)
-
-                            // RESULTADO
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    "${remaining.toInt()}",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp,
-                                    color = Color(0xFF1FA3A3)
-                                )
-                                Text("Remaining", fontSize = 12.sp, color = Color.Gray)
-                            }
+                        Spacer(Modifier.height(16.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            CalorieStat("Meta", goal)
+                            CalorieStat("Comida", foodCalories)
+                            CalorieStat("Ejercicio", exerciseCalories)
                         }
                     }
                 }
@@ -159,10 +139,16 @@ fun DiaryScreen(
                     key = {type -> type.name}
             )
             { type ->
+                val label = when (type) {
+                    MealType.BREAKFAST -> "Desayuno"
+                    MealType.LUNCH     -> "Almuerzo"
+                    MealType.DINNER    -> "Cena"
+                    MealType.SNACKS    -> "Snacks"
+                }
                 MealSection(
-                    section = type.name,
+                    section = label,
                     entries = grouped[type].orEmpty(),
-                    onAddClick = onAddMealClick,
+                    onAddClick = {onAddMealClick(type)},
                     onEntryDelete = {entry -> viewModel.deleteEntry(entry.id)},
                     onEntryClick = {entry -> onMealEditClick(entry.id)}
                 )
@@ -177,5 +163,15 @@ fun DiaryScreen(
             }
 
         }
+    }
+}
+
+@Composable
+private fun CalorieStat(label: String, value: Int) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(value.formatted(), style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+        Text(label, style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

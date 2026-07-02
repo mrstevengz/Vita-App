@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 
 //RUTAS DE LA APP. CADA DATA CLASS/OBJETO ES UNA PANTALLA
 //Se usan object para pantallas sin parametros, y dataclass para pantallas con ids, nombres, etc
-@Serializable
-object Welcome
 
 @Serializable
 object Register
@@ -19,9 +17,9 @@ data class Home(val name : String)
 data class Diary(val name : String)
 
 @Serializable
-object Catalog
+data class Catalog(val section: String)
 @Serializable
-data class AddMeal(val mealId: Int)
+data class AddMeal(val mealId: Int, val section: String)
 @Serializable
 data class EditMeal(val mealId: Int)
 

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,37 +23,23 @@ import com.example.vita_app.R
 import com.example.vita_app.ui.theme.CarbonBlack
 
 @Composable
-fun HomeTopBar(nombre: String) {
-
+fun HomeTopBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 35.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+            .padding(top = 24.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-
-        Column {
-            Text(
-                text = "Bienvenido,",
-                fontSize = 18.sp,
-                color = Color.Gray
-            )
-            Text(
-                text = nombre,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = CarbonBlack
-            )
-        }
-
-        //  LOGO (se usa Image y painter (painter resource para la ubicacion del logo))
+        Text(
+            "Bienvenido",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Image(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Logo App",
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
+            painter = painterResource(R.drawable.logo),
+            contentDescription = "Logo",
+            modifier = Modifier.size(44.dp).clip(CircleShape)
         )
     }
 }

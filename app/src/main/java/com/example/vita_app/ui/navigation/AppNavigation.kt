@@ -2,7 +2,11 @@ package com.example.vita_app.ui.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -12,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -20,11 +25,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.vita_app.ui.screen.home.HomeScreen
 import com.example.vita_app.ui.screen.login.LoginScreen
-import com.example.vita_app.ui.screen.login.WelcomeScreen
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.toRoute
 import com.example.vita_app.data.TokenManager
 import com.example.vita_app.data.TokenStore
+import com.example.vita_app.data.remote.model.MealType
+import com.example.vita_app.data.repository.EntryRepo
 import com.example.vita_app.ui.components.BottomBar
 import com.example.vita_app.ui.screen.meals.AddMeal
 import com.example.vita_app.ui.screen.meals.CatalogScreen
@@ -40,13 +46,14 @@ import com.example.vita_app.ui.screen.workouts.EditWorkoutScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutCatalogScreen
 import com.example.vita_app.ui.screen.workouts.WorkoutViewModel
 import kotlinx.coroutines.launch
+import java.util.Map.entry
 
 
 @SuppressLint("RestrictedApi")
 @Composable
 fun AppNavigation() {
     //INICIALIZAR NAV CONTROLLER
-    val navController = rememberNavController()
+    val navController = rememberNavController() //El router de la aplicacion, recuerda donde esta y el stack
 
 
 
@@ -65,15 +72,18 @@ fun AppNavigation() {
         } == true //== true hace que acepte nulos como verdaderos, ya que puede haber nulos con el ?
     }
 
-    //Se inicializa un viewmodel meals.
+    //VMs compartidos por TODAS las pantallas.
     val mealsViewModel: MealsViewModel = viewModel()
     val workoutsViewModel: WorkoutViewModel = viewModel()
 
 
+    //El estado del host de snackbars (recuerda quien muestra/oculta el snackbar)
     val snackbarHostState = remember {
         SnackbarHostState()
     }
 
+    //Se escuchan los eventos de los VMs compartidos para no perder eventos al cambiar de pantalla.
+    //Cada evento muestra un snackbar.
     LaunchedEffect(Unit) {
         mealsViewModel.events.collect { message -> snackbarHostState.showSnackbar(message) }
     }
@@ -82,53 +92,69 @@ fun AppNavigation() {
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState)},
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    shape = RoundedCornerShape(16.dp),                          // esquinas suaves
+                    containerColor = MaterialTheme.colorScheme.inverseSurface,   // barra oscura M3
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    actionColor = MaterialTheme.colorScheme.inversePrimary,      // acento teal en la acción
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp) // lo despega de los bordes -> se ve "flotante"
+                )
+            }
+        },
         bottomBar = {
-            if (showBottomBar) BottomBar(navController)
+            if (showBottomBar) BottomBar(navController) //Barra solo en Home y Diary
         }
-    ) { _ -> //Ignoro el padding de scaffold con _, para darle su padding propio a todas las pantallas
+    ) { _ -> //Ignora el padding de scaffold con _, para darle su padding propio a todas las pantallas
         //en AppBackground y que sean consistentes
         NavHost(
             navController = navController,
-            startDestination = Splash,
+            startDestination = Splash, //La app arranca en el Splash
             modifier = Modifier.fillMaxSize()
         ) {
             //Pantalla de carga
             composable<Splash> {
-                val context = LocalContext.current
-                LaunchedEffect(Unit) {
+                val context = LocalContext.current //Se le da el Context para leer tokens
+                LaunchedEffect(Unit) { //Corre una vez al entrar a Splash
                     val tokenStore = TokenStore(context.applicationContext)
-                    val saved = tokenStore.read()
+                    val saved = tokenStore.read() //Hay un token guardado? (.first, si)
 
-                    TokenManager.token = saved
-
-                    val destination = if (saved!=null) Home("")
-                    else Welcome
-
-                    navController.navigate(destination) {
-                        popUpTo(Splash) {inclusive = true}
+                    // Sin token guardado -> a Welcome
+                    if (saved == null) {
+                        navController.navigate(Login) { popUpTo(Splash) { inclusive = true } }
+                        return@LaunchedEffect
                     }
+
+                    // Hay token -> cargarlo y VALIDARLO con una llamada autenticada real
+                    TokenManager.token = saved
+                    val destination = try {
+                        EntryRepo().getEntries()          // 200 -> el token sirve de verdad
+                        Home("")
+                    } catch (e: retrofit2.HttpException) {
+                        if (e.code() == 401 || e.code() == 403) {
+                            // token expirado/inválido -> matar la sesión
+                            TokenManager.token = null
+                            tokenStore.clear()
+                        }
+                        Login                       // auth muerta (o error del server) -> no entrar
+                    } catch (e: Exception) {
+                        Login                      // API caída / sin red -> no entrar (token intacto)
+                    }
+
+                    navController.navigate(destination) { popUpTo(Splash) { inclusive = true } }
                 }
                 LoadingScreen()
-            }
-            //Pantalla de bienvenida
-
-            composable<Welcome> {
-                WelcomeScreen(
-                    onNavigateToLogin = {
-                        navController.navigate(Login) //Navega a la pantalla de Login
-                    },
-                    onRegisterClick = {
-                        navController.navigate(Register)
-                    }
-                )
             }
 
             //Pantalla de Registro
 
            composable<Register> {
-               val authViewModel: AuthViewModel = viewModel()
+               val authViewModel: AuthViewModel = viewModel() //Se le da un authViewModel a Register
 
+
+               //Recolecta todos los eventos y dependiendo de cual hace una accion, llama a las 3 en AuthEvent object
                LaunchedEffect(Unit) {
                    authViewModel.events.collect {
                        event -> when (event) {
@@ -146,7 +172,8 @@ fun AppNavigation() {
                RegisterScreen(
                    viewModel = authViewModel,
                    onNavigateToLogin = {
-                       navController.navigate(Login) {
+                       navController.navigate(Login) { //Navigate(ruta) apila una pantalla nueva al stack
+                           //Navega a login, y saca todas las pantallas que esten arriba de register, inclusive tambien quita register
                            popUpTo(Register) {inclusive = true}
                        }
                    }
@@ -162,14 +189,16 @@ fun AppNavigation() {
                         when(event) {
                             is AuthEvent.Success ->
                                 navController.navigate(Home(name = event.name)) {
-                                    popUpTo(Welcome) {inclusive = true}
+                                    popUpTo(Login) {inclusive = true}
                                 }
                             is AuthEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
                             is AuthEvent.RegisterSuccess -> {}
                         }
                     }
                 }
-                LoginScreen(viewModel = authViewModel)
+                LoginScreen(viewModel = authViewModel, onNavigateToRegister = {
+                    navController.navigate(Register)
+                })
             }
 
             //Pantalla de Home
@@ -185,8 +214,10 @@ fun AppNavigation() {
                         scope.launch {
                             TokenManager.token = null
                             TokenStore(context.applicationContext).clear()
-                            navController.navigate(Welcome) {
-                                popUpTo(0) {inclusive = true}
+                            mealsViewModel.clear()
+                            workoutsViewModel.clear()
+                            navController.navigate(Login) {
+                                popUpTo(0) {inclusive = true} //PopUpTo 0 quita TODA LA PILA
                             }
 
                         }
@@ -198,18 +229,21 @@ fun AppNavigation() {
                 DiaryScreen(
                     viewModel = mealsViewModel,
                     workoutsViewModel = workoutsViewModel,
-                    onAddMealClick = {navController.navigate(Catalog)},
+                    onAddMealClick = {section -> navController.navigate(Catalog(section.name))},
                     onMealEditClick = {id -> navController.navigate(EditMeal(id))},
                     onAddWorkoutClick = {navController.navigate(WorkoutCatalog)},
                     onWorkoutEditClick = {id -> navController.navigate(EditWorkout(id))}
                 )
             }
 
-            composable<Catalog> {
+            composable<Catalog> { entry ->
+                val args = entry.toRoute<Catalog>() //Entry es el navBackStackEntry de la pantalla
+                //ToRoute lo deserializa de vuelva al objeto (Catalog)
+                //Ahora args es el string que se pasa al navegar
                 CatalogScreen(
                     viewModel = mealsViewModel,
                     onMealClick = { id ->
-                        navController.navigate(AddMeal(id))
+                        navController.navigate(AddMeal(id, args.section))
                     },
                     onBack = {
                         navController.popBackStack()
@@ -222,8 +256,9 @@ fun AppNavigation() {
                 AddMeal(
                     viewModel = mealsViewModel,
                     mealId = args.mealId,
+                    initialSection = MealType.valueOf(args.section),
                     onMealAdd = {
-                        navController.popBackStack(Catalog, inclusive = true)
+                        navController.popBackStack(Catalog(args.section), inclusive = true)
                     },
                     onBack = {
                         navController.popBackStack()

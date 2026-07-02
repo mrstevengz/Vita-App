@@ -11,6 +11,9 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
+// Proposito: Define las llamadas HTTP para leer y modificar los ejercicios registrados por el usuario.
+
+// Interfaz Retrofit para registrar, editar o borrar ejercicios hechos por el usuario.
 interface WorkoutEntriesApi {
     @GET("workouts-entries")
     suspend fun getEntries(

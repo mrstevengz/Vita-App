@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.vita_app.ui.components.AppBackground
 
+//CircularProgressIndicator centrado, pantalla de carga
 @Composable
 fun LoadingScreen() {
     AppBackground {

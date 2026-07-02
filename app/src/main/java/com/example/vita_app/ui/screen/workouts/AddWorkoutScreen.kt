@@ -4,12 +4,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,82 +32,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.vita_app.ui.components.AppBackground
+import com.example.vita_app.ui.components.FormScaffold
+import com.example.vita_app.ui.components.PreviewCard
+import com.example.vita_app.ui.components.SelectedItemHeader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddWorkoutScreen(
-    viewModel: WorkoutViewModel,
-    workoutId: Int,
-    onAdd: () -> Unit,
-    onBack: () -> Unit
-) {
-    val workout = viewModel.workouts.find {it.id == workoutId}
+fun AddWorkoutScreen(viewModel: WorkoutViewModel, workoutId: Int, onAdd: () -> Unit, onBack: () -> Unit) {
+    val workout = viewModel.workouts.find { it.id == workoutId } ?: return
 
-    if(workout == null) {
-        Text("Workout not found")
-        return
-    }
+    var minutes by remember { mutableStateOf("") }
+    var submit by remember { mutableStateOf(false) }
+    val burned = ((workout.caloriesPerHour.toDoubleOrNull() ?: 0.0) *
+            (minutes.toDoubleOrNull() ?: 0.0) / 60.0).toInt()
 
-    //Estado local
-    var minutes by remember{ mutableStateOf("") }
-    var submit by remember {mutableStateOf(false)}
+    FormScaffold(title = "Agregar ejercicio", onBack = onBack) {
+        SelectedItemHeader(Icons.Default.FitnessCenter, workout.name, "${workout.caloriesPerHour} cal/h")
 
-    //Valores derivados
-    val perHour = workout.caloriesPerHour.toDoubleOrNull() ?: 0.0
-    val mins = minutes.toDoubleOrNull() ?: 0.0
-    val burned = (perHour * mins / 60.0).toInt()
+        OutlinedTextField(
+            value = minutes,
+            onValueChange = { minutes = it },
+            label = { Text("Minutos") },
+            singleLine = true,
+            shape = RoundedCornerShape(16.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
 
-    AppBackground {
-        Column(modifier = Modifier.fillMaxSize()) {
-            CenterAlignedTopAppBar(
-                title = { Text("Agregar workout") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Navegar hacia atras"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
+        PreviewCard("Se quemará", "$burned cal")
 
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Ejercicio elegido (solo lectura — referencia al catálogo)
-                Text(workout.name, style = MaterialTheme.typography.titleMedium)
-                Text("${workout.caloriesPerHour} cal/h", color = Color.Gray)
-
-                // Minutos hechos
-                OutlinedTextField(
-                    value = minutes,
-                    onValueChange = { minutes = it },
-                    label = { Text("Minutes") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                // Preview vivo de calorías quemadas (derivado de 'minutes')
-                Text("Quemarás ~$burned cal", color = Color.Gray)
-
-                // Add: crea la entrada de workout y vuelve atrás
-                Button(
-                    enabled = !submit && minutes.isNotBlank(),
-                    onClick = {
-                        submit = true
-                        viewModel.addEntry(workout.id, minutes)
-                        onAdd()
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Add")
-                }
-            }
-        }
+        Button(
+            enabled = !submit && minutes.isNotBlank(),
+            onClick = { submit = true; viewModel.addEntry(workout.id, minutes); onAdd() },
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp)
+        ) { Text("Agregar") }
     }
 }

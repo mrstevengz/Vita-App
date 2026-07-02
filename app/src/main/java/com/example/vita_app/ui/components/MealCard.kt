@@ -11,9 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -27,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,8 +42,6 @@ import com.example.vita_app.ui.theme.CarbonBlack
 
 @Composable
 fun MealSection(
-    /*La seccion de meal tiene como parametros su seccion especifica, la lista de meals que empiezan vacias,
-    * y una funcion para cuando se cliquee (abre addmeal) y cuando se desea borrar por medio de un swipe*/
     section: String,
     entries: List<DiaryEntryResponse> = emptyList(),
     onAddClick: () -> Unit = {},
@@ -46,95 +49,104 @@ fun MealSection(
     onEntryClick: (DiaryEntryResponse) -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(section, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = CarbonBlack)
+        Text(
+            section,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(Modifier.height(8.dp))
-
-        //CARDS de cada seccion
 
         Card(
             shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(1.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            /*SE REALIZA UN CARD DENTRO DE LA COLUMNA DE SECCION, donde por cada meal adentro de una seccion, se le otorga
-            * una llave (que es su ID) y se crea un MealRow con funcionalidad de swipe */
             Column {
                 entries.forEach { entry ->
-                    key(entry.id) {
-                        EntryRow(entry = entry, onDelete = onEntryDelete, onClick = onEntryClick)
-                    }
+                    key(entry.id) { EntryRow(entry, onEntryDelete, onEntryClick) }
                 }
-            }
 
-            Spacer(Modifier.height(8.dp))
-
-            //Add Food Row
-
-            Row(
-                modifier = Modifier.fillMaxWidth().clickable {onAddClick()}.padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("ADD FOOD", color = Color(0xFF1FA3A3), fontWeight = FontWeight.Bold)
-                Text("...", fontSize = 20.sp, color = Color.Gray)
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .clickable { onAddClick() }
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Agregar comida", color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium)
+                }
             }
         }
     }
 }
 
-//Se crea un private row donde se le otorga un swipe, un lambda para pasar un meal y realizar una accion (delete) y el UI
 @Composable
-private fun EntryRow(entry: DiaryEntryResponse, onDelete: (DiaryEntryResponse) -> Unit, onClick: (DiaryEntryResponse) -> Unit) {
-    //Se crea un SwipeToDismissBoxState Object
+private fun EntryRow(
+    entry: DiaryEntryResponse,
+    onDelete: (DiaryEntryResponse) -> Unit,
+    onClick: (DiaryEntryResponse) -> Unit
+) {
+    //Estadi del gesto de deslizar (lo calcula cada vez que cambia)
     val dismissState = rememberSwipeToDismissBoxState()
-
-    //Si cambia el valor del dismiss state, se confirma que haya terminado (end to start) y se mand a allamar la funcion
-    //para borrar el row especifico
+    //Se re-ejecuta cuando el valor del swipe cambia
     LaunchedEffect(dismissState.currentValue) {
-        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            onDelete(entry)
-        }
+        //Si se deslizo de der a izquierda, se dispara el borrado
+        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) onDelete(entry)
     }
 
-    //Calorias de la entrada = calorias por 100g
+    //Valores del entry
     val per100 = entry.meal.calories.toDoubleOrNull() ?: 0.0
-    //Gramos del meal
     val grams = entry.grams.toDoubleOrNull() ?: 0.0
-    //Calorias totales = calorias * gramos / 100
     val totalCal = (per100 * grams / 100.0).toInt()
 
-    //En el objeto se le asigna un estado (dismiss state), se desactiva la opcion para hacer swipe de derecha a izquierda,
-    // y se le da un diseño. Es el que esta debajo del row y lo que se mira al hacerle swipe
     SwipeToDismissBox(
-        state = dismissState,
-        enableDismissFromStartToEnd = false,
+        state = dismissState, //Estado que se observa
+        enableDismissFromStartToEnd = false, //Permite deslizar solo en una direccion
         backgroundContent = {
             Box(
-                modifier = Modifier.fillMaxSize().background(Color.Red).padding(horizontal = 20.dp),
+                modifier = Modifier.fillMaxSize()
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                Icon(Icons.Default.Delete, "Delete", tint = Color.White)
+                Icon(Icons.Default.Delete, "Eliminar",
+                    tint = MaterialTheme.colorScheme.onErrorContainer)
             }
         }
     ) {
-        /*Adentro del swipe object, se realiza el row que estara por encima. En este caso el row de comida normal*/
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(vertical = 12.dp, horizontal = 8.dp)
-                .clickable{onClick(entry)},
-
+                .clickable { onClick(entry) }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Izquierda: nombre (del catálogo) + gramos
-            Column {
-                Text(entry.meal.name, fontWeight = FontWeight.Medium)
-                Text("${grams.toInt()} g", fontSize = 12.sp, color = Color.Gray)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier.size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Restaurant, contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                }
+                Spacer(Modifier.width(12.dp))
+                Column {
+                    Text(entry.meal.name, style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+                    Text("${grams.toInt()} g", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
-            // Derecha: calorías calculadas
-            Text("$totalCal cal", color = Color.Gray)
-        }
+            Text("$totalCal cal", style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
+}
