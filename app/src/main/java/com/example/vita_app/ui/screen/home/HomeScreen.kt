@@ -1,5 +1,9 @@
 package com.example.vita_app.ui.screen.home
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -106,6 +110,17 @@ fun HomeScreen(
     val ringProgress = if (remaining < 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     //Progreso de 0 a 1 para el anillo
     val progress = (foodCalories.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f)
+    val animatedProgress by animateFloatAsState(
+        targetValue = progress,
+        animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+        label = "ringProgress"
+    )
+
+    val animatedRemaining by animateIntAsState(
+        targetValue = remaining,
+        animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
+        label = "remainingCount"
+    )
     val todayLabel = remember { //Se calcula una vez la fecha
         LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMM", Locale("es")))
     }
@@ -115,7 +130,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 100.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp)
         ) {
             // Header
             Row(
@@ -147,10 +162,10 @@ fun HomeScreen(
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(128.dp)) {
                         Canvas(Modifier.fillMaxSize()) {
                             drawArc(ringTrack, 0f, 360f, false, style = Stroke(30f, cap = StrokeCap.Round))
-                            drawArc(ringProgress, -90f, progress * 360f, false, style = Stroke(30f, cap = StrokeCap.Round))
+                            drawArc(ringProgress, -90f, animatedProgress * 360f, false, style = Stroke(30f, cap = StrokeCap.Round))
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(remaining.formatted(), style = MaterialTheme.typography.headlineMedium,
+                            Text(animatedRemaining.formatted(), style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = if(remaining < 0)
                                     MaterialTheme.colorScheme.error

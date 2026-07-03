@@ -34,7 +34,7 @@ fun DateSelectorRow(
         else -> date.format(DateTimeFormatter.ofPattern("EEE d MMM")) //Si no, fecha completa
     }
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
